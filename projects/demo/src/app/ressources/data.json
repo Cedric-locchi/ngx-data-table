@@ -1,0 +1,240 @@
+[
+  {
+    "title": "Catan",
+    "description": "Un jeu de stratégie où les joueurs colonisent une île et échangent des ressources.",
+    "creationDate": "1995-01-01",
+    "tags": ["stratégie", "commerce", "gestion"],
+    "rating": 4.7
+  },
+  {
+    "title": "Carcassonne",
+    "description": "Les joueurs construisent des villes et routes en posant des tuiles dans une région médiévale.",
+    "creationDate": "2000-01-01",
+    "tags": ["pose de tuiles", "construction", "médiéval"],
+    "rating": 4.5
+  },
+  {
+    "title": "7 Wonders",
+    "description": "Un jeu de civilisation où les joueurs développent des cités antiques pour construire des merveilles.",
+    "creationDate": "2010-01-01",
+    "tags": ["civilisation", "draft", "stratégie"],
+    "rating": 4.8
+  },
+  {
+    "title": "Risk",
+    "description": "Un jeu de conquête où les joueurs tentent de dominer le monde avec leurs armées.",
+    "creationDate": "1959-01-01",
+    "tags": ["guerre", "conquête", "stratégie"],
+    "rating": 4.2
+  },
+  {
+    "title": "Pandemic",
+    "description": "Les joueurs collaborent pour éradiquer des maladies menaçant l'humanité.",
+    "creationDate": "2008-01-01",
+    "tags": ["coopératif", "sauver le monde", "gestion de crise"],
+    "rating": 4.9
+  },
+  {
+    "title": "Dixit",
+    "description": "Un jeu d'association d'images poétiques où les joueurs doivent interpréter des illustrations.",
+    "creationDate": "2008-01-01",
+    "tags": ["imaginaire", "créativité", "famille"],
+    "rating": 4.6
+  },
+  {
+    "title": "Ticket to Ride",
+    "description": "Les joueurs construisent des lignes de train pour relier des villes à travers le monde.",
+    "creationDate": "2004-01-01",
+    "tags": ["voyage", "stratégie", "train"],
+    "rating": 4.7
+  },
+  {
+    "title": "Agricola",
+    "description": "Un jeu de gestion agricole où les joueurs développent leur ferme et leur famille.",
+    "creationDate": "2007-01-01",
+    "tags": ["gestion", "agriculture", "stratégie"],
+    "rating": 4.3
+  },
+  {
+    "title": "Azul",
+    "description": "Les joueurs décorent un palais en posant des carreaux de céramique colorés.",
+    "creationDate": "2017-01-01",
+    "tags": ["abstrait", "stratégie", "design"],
+    "rating": 4.8
+  },
+  {
+    "title": "Terra Mystica",
+    "description": "Un jeu de colonisation et de développement de civilisations dans un monde fantastique.",
+    "creationDate": "2012-01-01",
+    "tags": ["stratégie", "fantastique", "gestion"],
+    "rating": 4.8
+  },
+  {
+    "title": "Dominion",
+    "description": "Un jeu de construction de deck où les joueurs acquièrent des cartes pour développer leur royaume.",
+    "creationDate": "2008-01-01",
+    "tags": ["cartes", "deck-building", "stratégie"],
+    "rating": 4.7
+  },
+  {
+    "title": "Cluedo",
+    "description": "Un jeu d'enquête où les joueurs tentent de résoudre un meurtre en identifiant le coupable, l'arme et le lieu.",
+    "creationDate": "1949-01-01",
+    "tags": ["enquête", "mystère", "famille"],
+    "rating": 4.0
+  },
+  {
+    "title": "Monopoly",
+    "description": "Un classique où les joueurs achètent et développent des propriétés pour ruiner leurs adversaires.",
+    "creationDate": "1935-01-01",
+    "tags": ["commerce", "capitalisme", "chance"],
+    "rating": 3.8
+  },
+  {
+    "title": "Les Loups-garous de Thiercelieux",
+    "description": "Un jeu d'ambiance où les joueurs incarnent des villageois ou des loups-garous, cherchant à démasquer les uns ou les autres.",
+    "creationDate": "2001-01-01",
+    "tags": ["ambiance", "déduction", "rôles cachés"],
+    "rating": 4.4
+  },
+  {
+    "title": "Splendor",
+    "description": "Les joueurs incarnent des marchands de la Renaissance accumulant des pierres précieuses pour obtenir du prestige.",
+    "creationDate": "2014-01-01",
+    "tags": ["stratégie", "commerce", "développement"],
+    "rating": 4.6
+  },
+  {
+    "title": "Terraforming Mars",
+    "description": "Les joueurs collaborent pour transformer Mars en une planète habitable tout en rivalisant pour obtenir du prestige.",
+    "creationDate": "2016-01-01",
+    "tags": ["science-fiction", "gestion", "terraforming"],
+    "rating": 4.9
+  },
+  {
+    "title": "Kingdomino",
+    "description": "Un jeu de dominos stratégique où les joueurs construisent un royaume en reliant des tuiles de terrain.",
+    "creationDate": "2016-01-01",
+    "tags": ["dominos", "stratégie", "famille"],
+    "rating": 4.5
+  },
+  {
+    "title": "Codenames",
+    "description": "Un jeu de mots où les joueurs devinent les mots-clés avec des indices donnés par un maître espion.",
+    "creationDate": "2015-01-01",
+    "tags": ["mots", "espionnage", "coopératif"],
+    "rating": 4.7
+  },
+  {
+    "title": "Patchwork",
+    "description": "Un jeu où deux joueurs assemblent un patchwork avec des pièces de tissu en compétition.",
+    "creationDate": "2014-01-01",
+    "tags": ["abstrait", "stratégie", "2 joueurs"],
+    "rating": 4.6
+  },
+  {
+    "title": "Sherlock Holmes: Détective Conseil",
+    "description": "Les joueurs incarnent des détectives dans le Londres victorien et résolvent des enquêtes.",
+    "creationDate": "1981-01-01",
+    "tags": ["enquête", "coopératif", "déduction"],
+    "rating": 4.8
+  },
+  {
+    "title": "Unlock!",
+    "description": "Un jeu d'escape room où les joueurs résolvent des énigmes pour s'échapper dans un temps limité.",
+    "creationDate": "2017-01-01",
+    "tags": ["escape room", "coopératif", "énigmes"],
+    "rating": 4.7
+  },
+  {
+    "title": "The Mind",
+    "description": "Un jeu minimaliste où les joueurs doivent jouer des cartes dans l'ordre croissant sans parler.",
+    "creationDate": "2018-01-01",
+    "tags": ["coopératif", "intuition", "minimaliste"],
+    "rating": 4.3
+  },
+  {
+    "title": "Zombicide",
+    "description": "Un jeu coopératif où les joueurs combattent des hordes de zombies dans différents scénarios.",
+    "creationDate": "2012-01-01",
+    "tags": ["zombies", "coopératif", "action"],
+    "rating": 4.6
+  },
+  {
+    "title": "King of Tokyo",
+    "description": "Les joueurs incarnent des monstres géants qui s'affrontent pour contrôler Tokyo.",
+    "creationDate": "2011-01-01",
+    "tags": ["combat", "monstres", "familial"],
+    "rating": 4.5
+  },
+  {
+    "title": "Scythe",
+    "description": "Un jeu de stratégie dans une Europe alternative où les joueurs contrôlent des factions avec des mechas.",
+    "creationDate": "2016-01-01",
+    "tags": ["stratégie", "mechas", "conquête"],
+    "rating": 4.8
+  },
+  {
+    "title": "Gloomhaven",
+    "description": "Un jeu coopératif d'aventure où les joueurs explorent des donjons et accomplissent des quêtes.",
+    "creationDate": "2017-01-01",
+    "tags": ["coopératif", "aventure", "fantastique"],
+    "rating": 4.9
+  },
+  {
+    "title": "Brass: Birmingham",
+    "description": "Un jeu de stratégie économique dans l'Angleterre industrielle du XIXe siècle.",
+    "creationDate": "2018-01-01",
+    "tags": ["stratégie", "économie", "histoire"],
+    "rating": 4.8
+  },
+  {
+    "title": "Tzolk'in: Le calendrier Maya",
+    "description": "Un jeu de gestion de ressources où les joueurs développent leur civilisation maya en synchronisant leurs actions avec des roues dentées.",
+    "creationDate": "2012-01-01",
+    "tags": ["civilisation", "gestion", "stratégie"],
+    "rating": 4.7
+  },
+  {
+    "title": "Concordia",
+    "description": "Un jeu de stratégie économique où les joueurs développent un empire commercial dans la Rome antique.",
+    "creationDate": "2013-01-01",
+    "tags": ["stratégie", "commerce", "Rome antique"],
+    "rating": 4.6
+  },
+  {
+    "title": "Spirit Island",
+    "description": "Les joueurs incarnent des esprits de la nature et défendent leur île contre des envahisseurs.",
+    "creationDate": "2017-01-01",
+    "tags": ["coopératif", "fantastique", "défense"],
+    "rating": 4.9
+  },
+  {
+    "title": "Decrypto",
+    "description": "Un jeu de mots où les joueurs envoient des messages codés et doivent empêcher les adversaires de les déchiffrer.",
+    "creationDate": "2018-01-01",
+    "tags": ["mots", "communication", "coopératif"],
+    "rating": 4.5
+  },
+  {
+    "title": "Wingspan",
+    "description": "Un jeu de gestion où les joueurs développent une réserve ornithologique pour attirer diverses espèces d'oiseaux.",
+    "creationDate": "2019-01-01",
+    "tags": ["gestion", "nature", "stratégie"],
+    "rating": 4.8
+  },
+  {
+    "title": "Everdell",
+    "description": "Les joueurs construisent une ville en bois dans un monde fantastique rempli de créatures forestières.",
+    "creationDate": "2018-01-01",
+    "tags": ["stratégie", "fantastique", "construction"],
+    "rating": 4.7
+  },
+  {
+    "title": "Mysterium",
+    "description": "Un jeu coopératif d'enquête où les joueurs interprètent les visions d'un fantôme pour résoudre un meurtre.",
+    "creationDate": "2015-01-01",
+    "tags": ["coopératif", "enquête", "fantôme"],
+    "rating": 4.6
+  }
+]
