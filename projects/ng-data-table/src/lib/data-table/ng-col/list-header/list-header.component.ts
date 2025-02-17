@@ -1,4 +1,4 @@
-import {Component, EventEmitter, input, InputSignal, Output, output, OutputEmitterRef} from '@angular/core';
+import {Component, input, InputSignal, output, OutputEmitterRef} from '@angular/core';
 import {colDef} from '../../../core';
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {faSort} from '@fortawesome/free-solid-svg-icons';
