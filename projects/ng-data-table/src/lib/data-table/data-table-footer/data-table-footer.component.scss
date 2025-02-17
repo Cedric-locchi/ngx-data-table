@@ -1,0 +1,16 @@
+.footer {
+  min-height: 40px;
+  width: fit-content;
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  p {
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 400;
+    color: #688EAD;
+  }
+
+}

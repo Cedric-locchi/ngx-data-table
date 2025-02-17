@@ -1,0 +1,27 @@
+.list-header {
+  height: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  h4 {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: left;
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
+  .badge-count {
+    height: 100%;
+    width: auto;
+    background-color: #D3EEFF;
+    color: #003C67;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+
+}

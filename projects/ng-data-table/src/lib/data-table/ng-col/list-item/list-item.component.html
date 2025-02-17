@@ -1,0 +1,19 @@
+<div
+  (click)="selectItem(index())"
+  (mouseenter)="hoverLine($event)"
+  (mouseleave)="removeHoveredLine($event)"
+  [class.isNotCollapsible]="isCollapsible()"
+  [class.odd]="isStripped() ? odd() : false"
+  class="col-item col-{{index()}}-{{componentId()}}">
+    <span [class.bold]="col().isBold">
+      @if (col().isState) {
+        <span [class.danger]="item().toLowerCase() === 'inactif'"
+              [class.success]="item().toLowerCase() === 'actif'"
+              class="badge">
+          {{ item() }}
+        </span>
+      } @else {
+        {{ item() }}
+      }
+    </span>
+</div>
