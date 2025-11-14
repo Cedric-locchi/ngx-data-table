@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   inject, Input,
@@ -10,16 +11,16 @@ import {
   Signal,
   SimpleChanges,
 } from '@angular/core';
-import {colDef, dynamic, ListManager} from '../core';
-import {DataTableManagerService} from '../services';
-import {DateTime} from 'luxon';
-import {ListItemComponent} from './ng-col/list-item/list-item.component';
-import {ListHeaderComponent} from './ng-col/list-header/list-header.component';
+import { colDef, dynamic, ListManager } from '../core';
+import { DataTableManagerService } from '../services';
+import { DateTime } from 'luxon';
+import { ListItemComponent } from './ng-col/list-item/list-item.component';
+import { ListHeaderComponent } from './ng-col/list-header/list-header.component';
 
-type rowClicked = {
-  item: string;
+export type rowClicked = {
   col: colDef;
   index: number;
+  row: dynamic;
 }
 
 @Component({
@@ -28,11 +29,11 @@ type rowClicked = {
   imports: [ListItemComponent, ListHeaderComponent],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',
-
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DataTableComponent implements OnChanges {
 
-  @Input() dataSources: dynamic[] = [];
+  dataSources: InputSignal<dynamic[]> = input.required();
 
   colDef: InputSignal<colDef[]> = input.required();
   isStripped: InputSignal<boolean> = input(false);
@@ -64,8 +65,16 @@ export class DataTableComponent implements OnChanges {
     this.dataTableManager.dataSources = changes['dataSources'].currentValue
   }
 
+  clicked(index: number) {
+    const col = this.localColDef().find((c) => c.isClickable);
+    const row = this.dataTableManager.dataSources[index];
+    if (col) {
+      this.rowIsClicked.emit({ col: col, index: index, row: row });
+    }
+  }
+
   private sortDataSource(field: string, direction: 'asc' | 'desc', col: colDef) {
-    this.dataSources.sort((a, b) => {
+    this.dataSources().sort((a, b) => {
       let comparison: number;
       if (col.isDate) {
         const dateA = DateTime.fromISO(a[field]);
@@ -77,8 +86,8 @@ export class DataTableComponent implements OnChanges {
       return direction === 'asc' ? comparison : -comparison;
     });
 
-    this.listManager.saveData([...this.dataSources]);
-    this.dataTableManager.dataSources = [...this.dataSources];
+    this.listManager.saveData([...this.dataSources()]);
+    this.dataTableManager.dataSources = [...this.dataSources()];
   }
 
 }

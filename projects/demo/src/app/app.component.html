@@ -1,0 +1,28 @@
+<div class="demo-container">
+  <header>
+    <h1>{{ title }}</h1>
+    <p class="subtitle">
+      Démonstration du composant NgxDataTable avec une liste de jeux de société
+    </p>
+  </header>
+
+  <main>
+    <div class="table-container">
+
+      <div class="row-table-header">
+        <ng-data-table-header header [size]="games().length" />
+        <ng-data-table-input-search (searchTerm)="find($event)" />
+      </div>
+
+      <ng-data-table
+        [dataSources]="games()"
+        [colDef]="colDef()"
+        [isStripped]="true"
+        [displayBorder]="true"
+        (rowIsClicked)="onRowClick($event)"
+      />
+
+      <ng-data-table-footer [size]="games().length" />
+    </div>
+  </main>
+</div>
