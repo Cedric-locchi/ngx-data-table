@@ -36,7 +36,7 @@ export class ListManager {
     this.store.next(state);
   }
 
-	public getDataByKey(key: string): dynamic[] {
+	public getDataByKey(key: string): unknown[] {
 		return this.store.getValue().data.map((row: dynamic) => {
 			return row[key];
 		});

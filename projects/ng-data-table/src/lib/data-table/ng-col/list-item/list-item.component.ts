@@ -66,8 +66,10 @@ export class ListItemComponent implements AfterViewInit, OnInit {
 		this.listManager.store
 			.pipe(
 				tap((state) => {
-					if(state.data[this.index()]){
-						this.rowStateCollapsed.set(state.data[this.index()]['isCollapsible']);
+					const row = state.data[this.index()];
+					if (row) {
+						const isCollapsible = row['isCollapsible'];
+						this.rowStateCollapsed.set(typeof isCollapsible === 'boolean' ? isCollapsible : false);
 					}
 				}),
 			)

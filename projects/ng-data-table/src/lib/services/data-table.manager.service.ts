@@ -1,5 +1,4 @@
 import {Injectable, signal, WritableSignal} from '@angular/core';
-
 import {DateTime} from 'luxon';
 import {colDef, dynamic} from '../core';
 
@@ -28,11 +27,20 @@ export class DataTableManagerService {
     if (data === undefined || data === null) {
       return 'non renseigné';
     }
+
+    const value = data[col.field];
+
+    if (value === undefined || value === null) {
+      return 'non renseigné';
+    }
+
     if (col.isDate) {
-      const date = DateTime.fromISO(data[col.field]).toLocaleString(DateTime.DATE_SHORT);
+      const dateValue = typeof value === 'string' ? value : String(value);
+      const date = DateTime.fromISO(dateValue).toLocaleString(DateTime.DATE_SHORT);
       return date === 'Invalid DateTime' ? 'non renseigné' : date;
     }
-    return data[col.field];
+
+    return String(value);
   }
 
 }

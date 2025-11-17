@@ -11,22 +11,10 @@ import {
   Signal,
   SimpleChanges,
 } from '@angular/core';
-import { colDef, dynamic, ListManager } from '../core';
+import { colDef, dynamic, ListManager, rowClicked, sortEvent } from '../core';
 import { DataTableManagerService } from '../services';
 import { ListItemComponent } from './ng-col/list-item/list-item.component';
 import { ListHeaderComponent } from './ng-col/list-header/list-header.component';
-
-export type rowClicked = {
-  col: colDef;
-  index: number;
-  row: dynamic;
-}
-
-export type sortEvent = {
-  field: string;
-  direction: 'asc' | 'desc';
-  col: colDef;
-}
 
 @Component({
   selector: 'ng-data-table',
