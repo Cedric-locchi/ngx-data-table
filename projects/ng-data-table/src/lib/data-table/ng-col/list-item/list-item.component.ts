@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, inject, Input, input, InputSignal, OnInit, output, Output, OutputEmitterRef, signal, Type, viewChild, ViewContainerRef, WritableSignal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, inject, Input, input, InputSignal, OnInit, output, Output, OutputEmitterRef, signal, Type, viewChild, ViewContainerRef, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { faChevronDown, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { tap } from 'rxjs';
@@ -9,7 +9,8 @@ import {BaseListItemComponent, colDef, dynamic, ListManager} from '../../../core
 	standalone: true,
 	imports: [CommonModule],
 	templateUrl: './list-item.component.html',
-	styleUrl: './list-item.component.scss',
+	styleUrls: ['./list-item.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ListItemComponent implements AfterViewInit, OnInit {
 	public readonly container = viewChild('container', { read: ViewContainerRef });

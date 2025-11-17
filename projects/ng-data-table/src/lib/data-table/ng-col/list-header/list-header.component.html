@@ -1,8 +1,10 @@
-<div class="col-header" *ngIf="f()">
-     <span>
-        {{ col().headerName }}
-       @if (sortable(col())) {
-         <fa-icon [icon]="faSort" (click)="sortByColumn(col())"></fa-icon>
-       }
-     </span>
+@if(f()) {
+<div class="col-header">
+  <span>
+    {{ col().headerName }}
+    @if (sortable(col())) {
+    <fa-icon [icon]="faSort" (click)="sortByColumn(col())"></fa-icon>
+    }
+  </span>
 </div>
+}

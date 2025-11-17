@@ -1,17 +1,16 @@
-import {Component, input, InputSignal, output, OutputEmitterRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef} from '@angular/core';
 import {colDef} from '../../../core';
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {faSort} from '@fortawesome/free-solid-svg-icons';
-import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'ng-list-header',
   imports: [
     FaIconComponent,
-    NgIf
   ],
   templateUrl: './list-header.component.html',
-  styleUrl: './list-header.component.scss'
+  styleUrls: ['./list-header.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ListHeaderComponent {
 

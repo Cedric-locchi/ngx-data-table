@@ -33,7 +33,7 @@ export type sortEvent = {
   standalone: true,
   imports: [ListItemComponent, ListHeaderComponent],
   templateUrl: './data-table.component.html',
-  styleUrl: './data-table.component.scss',
+  styleUrls: ['./data-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DataTableComponent implements OnChanges {
