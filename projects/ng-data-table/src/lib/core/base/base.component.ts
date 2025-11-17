@@ -9,9 +9,9 @@ import { Subject } from 'rxjs';
   template: '',
 })
 export abstract class BaseComponent implements OnDestroy {
-  protected $unsubscribe: Subject<void> = new Subject<void>();
+  protected readonly $unsubscribe: Subject<void> = new Subject<void>();
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.$unsubscribe.next();
     this.$unsubscribe.complete();
   }

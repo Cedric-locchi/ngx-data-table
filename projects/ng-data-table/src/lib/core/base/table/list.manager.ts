@@ -16,7 +16,7 @@ type state = { isCollapsed: boolean };
 })
 export class ListManager {
 
-  store: BehaviorSubject<listState> = new BehaviorSubject<listState>({} as listState);
+  public readonly store: BehaviorSubject<listState> = new BehaviorSubject<listState>({} as listState);
 
   constructor() {
     const state = { isCollapsed: false };
@@ -24,19 +24,19 @@ export class ListManager {
     this.store.next({ data: [], state, rowState });
   }
 
-  saveRowState(row: rowState) {
+  public saveRowState(row: rowState): void {
     const state = this.store.getValue();
     state.rowState = row;
     this.store.next(state);
   }
 
-  saveData(data: dynamic[]) {
+  public saveData(data: dynamic[]): void {
    const state = this.store.getValue();
     state.data = data;
     this.store.next(state);
   }
 
-	getDataByKey(key: string): dynamic[] {
+	public getDataByKey(key: string): dynamic[] {
 		return this.store.getValue().data.map((row: dynamic) => {
 			return row[key];
 		});

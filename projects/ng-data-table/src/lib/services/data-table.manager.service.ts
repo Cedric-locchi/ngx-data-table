@@ -10,15 +10,15 @@ export class DataTableManagerService {
 
   public _dataSources: WritableSignal<dynamic[]> = signal([]);
 
-  set dataSources(value: dynamic[]) {
+  public set dataSources(value: dynamic[]) {
     this._dataSources.set(value);
   }
 
-  get dataSources(): dynamic[] {
+  public get dataSources(): dynamic[] {
     return this._dataSources();
   }
 
-  getDataFromCol(col: colDef): string[] {
+  public getDataFromCol(col: colDef): string[] {
     return this.dataSources.map(row => {
       return this.dataFromCol(row, col);
     });

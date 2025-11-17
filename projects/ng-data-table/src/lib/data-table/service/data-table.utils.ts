@@ -1,5 +1,5 @@
 
-export const updateCLassList = (event: any, callback: Function) => {
+export const updateCLassList = (event: any, callback: Function): void => {
   const selector = `div.${event.currentTarget.classList[0]}`.toString();
   const items = document.querySelectorAll(selector);
   items.forEach((item: Element) => {

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, inject, Input, input, InputSignal, OnInit, Output, signal, Type, ViewChild, ViewContainerRef, WritableSignal } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, Input, input, InputSignal, OnInit, output, Output, OutputEmitterRef, signal, Type, viewChild, ViewContainerRef, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { faChevronDown, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { tap } from 'rxjs';
@@ -12,40 +12,37 @@ import {BaseListItemComponent, colDef, dynamic, ListManager} from '../../../core
 	styleUrl: './list-item.component.scss',
 })
 export class ListItemComponent implements AfterViewInit, OnInit {
-	@ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;
+	public readonly container = viewChild('container', { read: ViewContainerRef });
 
-	dataSource: InputSignal<dynamic[]> = input.required();
-	index: InputSignal<number> = input.required();
-	odd: InputSignal<boolean> = input.required();
-	componentId: InputSignal<string> = input.required();
-	item: InputSignal<string> = input.required();
-	col: InputSignal<colDef> = input.required();
+  public readonly isClickable: InputSignal<boolean> = input(false);
+	public readonly dataSource: InputSignal<dynamic[]> = input.required();
+	public readonly index: InputSignal<number> = input.required();
+	public readonly odd: InputSignal<boolean> = input.required();
+	public readonly componentId: InputSignal<string> = input.required();
+	public readonly item: InputSignal<string> = input.required();
+	public readonly col: InputSignal<colDef> = input.required();
+	public readonly first: InputSignal<boolean> = input(false);
+	public readonly isCollapsible: InputSignal<boolean> = input(false);
+	public readonly isStripped: InputSignal<boolean> = input(false);
 
-	first: InputSignal<boolean> = input(false);
-	isCollapsible: InputSignal<boolean> = input(false);
-	isStripped: InputSignal<boolean> = input(false);
+	public readonly rowStateCollapsed: WritableSignal<boolean> = signal(false);
+	public readonly icon: IconDefinition = faChevronDown;
 
-	rowStateCollapsed: WritableSignal<boolean> = signal(false);
-	icon: IconDefinition = faChevronDown;
 
-	@Output()
-	rowIsClicked: EventEmitter<number> = new EventEmitter<number>();
-
-	@Input()
-	isClickable = false;
+	public readonly rowIsClicked: OutputEmitterRef<number> = output<number>();
 
 	private readonly listManager: ListManager = inject(ListManager);
 
-	selectItem(index: number) {
+	public selectItem(index: number): void {
 		this.rowIsClicked.emit(index);
 	}
 
-	hoverLine(event: any) {
+	public hoverLine(event: any): void {
 		const selector = `div.${event.currentTarget.classList[0]}`.toString();
 		const items = document.querySelectorAll(selector);
 		items.forEach((item: Element) => {
 			item.classList.add('hovered');
-			if (this.isClickable) {
+			if (this.isClickable()) {
 				item.classList.add('clickable');
 			}
 		});
@@ -56,7 +53,7 @@ export class ListItemComponent implements AfterViewInit, OnInit {
 		}
 	}
 
-	removeHoveredLine(event: any) {
+	public removeHoveredLine(event: any): void {
 		const selector = `div.${event.currentTarget.classList[0]}`.toString();
 		const items = document.querySelectorAll(selector);
 		items.forEach((item: Element) => {
@@ -64,7 +61,7 @@ export class ListItemComponent implements AfterViewInit, OnInit {
 		});
 	}
 
-	ngOnInit() {
+	public ngOnInit(): void {
 		this.listManager.store
 			.pipe(
 				tap((state) => {
@@ -76,9 +73,11 @@ export class ListItemComponent implements AfterViewInit, OnInit {
 			.subscribe();
 	}
 
-	ngAfterViewInit() {
-		if (this.col().template !== undefined) {
-			const ref = this.container.createComponent<BaseListItemComponent>(this.col().template as Type<BaseListItemComponent>);
+	public ngAfterViewInit(): void {
+		const containerRef = this.container();
+		const template = this.col().template;
+		if (template && containerRef) {
+			const ref = containerRef.createComponent<BaseListItemComponent>(template);
 			ref.instance.rowId = this.index();
 			ref.instance.col = this.col();
 		}

@@ -13,17 +13,17 @@ import {tap} from 'rxjs';
 })
 export abstract class BaseListItemComponent extends BaseComponent implements OnInit {
 
-  rowId!: number;
-  col!: colDef;
+  public rowId!: number;
+  public col!: colDef;
 
   protected data: WritableSignal<dynamic[]> = signal([]);
   protected readonly listManager: ListManager = inject(ListManager);
 
-  getDataFromKey(key: string) {
+  public getDataFromKey(key: string): unknown {
     return this.listManager.getDataByKey(key);
   }
 
-  ngOnInit() {
+  public ngOnInit(): void {
     this.listManager.store
       .pipe(
         tap(state => {
