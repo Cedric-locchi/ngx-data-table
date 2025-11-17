@@ -15,7 +15,6 @@ import { colDef, dynamic, ListManager, rowClicked, sortEvent } from '../core';
 import { DataTableManagerService } from '../services';
 import { ListItemComponent } from './ng-col/list-item/list-item.component';
 import { ListHeaderComponent } from './ng-col/list-header/list-header.component';
-import { nanoid } from 'nanoid';
 
 @Component({
   selector: 'ng-data-table',
@@ -35,7 +34,7 @@ export class DataTableComponent implements OnChanges {
   public readonly rowIsClicked: OutputEmitterRef<rowClicked> = output<rowClicked>();
   public readonly sortDataSource: OutputEmitterRef<sortEvent> = output<sortEvent>();
 
-  public readonly componentId: string = nanoid(10);
+  public readonly componentId: string = Math.random().toString(36).substring(7);
   public readonly dataTableManager: DataTableManagerService = inject(DataTableManagerService);
   public readonly listManager: ListManager = inject(ListManager);
 
