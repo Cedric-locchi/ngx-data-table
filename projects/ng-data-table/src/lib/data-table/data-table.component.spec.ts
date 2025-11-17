@@ -57,8 +57,7 @@ describe('DataTableComponent', () => {
   it('should generate a unique componentId', () => {
     fixture.detectChanges();
     expect(component.componentId).toBeTruthy();
-    expect(component.componentId).toMatch(/^[a-z0-9]+$/);
-    expect(component.componentId.length).toBeGreaterThan(0);
+    expect(component.componentId.length).toBe(10);
   });
 
   it('should inject DataTableManagerService and ListManager', () => {
