@@ -1,12 +1,11 @@
-import {Injectable, signal, WritableSignal} from '@angular/core';
-import {DateTime} from 'luxon';
-import {colDef, dynamic} from '../core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
+import { DateTime } from 'luxon';
+import { colDef, dynamic } from '../core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DataTableManagerService {
-
   public _dataSources: WritableSignal<dynamic[]> = signal([]);
 
   public set dataSources(value: dynamic[]) {
@@ -18,7 +17,7 @@ export class DataTableManagerService {
   }
 
   public getDataFromCol(col: colDef): string[] {
-    return this.dataSources.map(row => {
+    return this.dataSources.map((row) => {
       return this.dataFromCol(row, col);
     });
   }
@@ -42,5 +41,4 @@ export class DataTableManagerService {
 
     return String(value);
   }
-
 }

@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject, Input,
+  inject,
   input,
   InputSignal,
   OnChanges,
@@ -23,10 +23,9 @@ import { nanoid } from 'nanoid';
   imports: [ListItemComponent, ListHeaderComponent],
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataTableComponent implements OnChanges {
-
   public readonly dataSources: InputSignal<dynamic[]> = input.required();
   public readonly colDef: InputSignal<colDef[]> = input.required();
   public readonly isStripped: InputSignal<boolean> = input(false);
@@ -40,7 +39,7 @@ export class DataTableComponent implements OnChanges {
   public readonly listManager: ListManager = inject(ListManager);
 
   public readonly localColDef: Signal<colDef[]> = computed(() => this.colDef());
-  public readonly sortDirection: { [key: string]: 'asc' | 'desc' } = {};
+  public readonly sortDirection: Record<string, 'asc' | 'desc'> = {};
 
   public get colDefVisible(): colDef[] {
     return this.localColDef().filter((col: colDef) => col.isVisible);
@@ -55,7 +54,7 @@ export class DataTableComponent implements OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.listManager.saveData(changes['dataSources'].currentValue);
-    this.dataTableManager.dataSources = changes['dataSources'].currentValue
+    this.dataTableManager.dataSources = changes['dataSources'].currentValue;
   }
 
   public clicked(index: number): void {
@@ -65,5 +64,4 @@ export class DataTableComponent implements OnChanges {
       this.rowIsClicked.emit({ col: col, index: index, row: row });
     }
   }
-
 }

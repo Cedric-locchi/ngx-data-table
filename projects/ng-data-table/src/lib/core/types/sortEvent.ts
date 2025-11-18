@@ -1,4 +1,4 @@
-import { colDefSchema } from "./coldef";
+import { colDefSchema } from './coldef';
 import { z } from 'zod';
 
 export const sortEventSchema = z.object({

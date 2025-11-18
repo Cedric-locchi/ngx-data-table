@@ -2,7 +2,11 @@ import { Component, signal } from '@angular/core';
 import { DataTableComponent } from '../../../ng-data-table/src/lib/data-table/data-table.component';
 import { colDef } from '../../../ng-data-table/src/lib/core/types/coldef';
 import gamesData from './ressources/data.json';
-import { DataTableHeaderComponent, DataTableFooterComponent, DataTableInputSearchComponent } from "../../../ng-data-table/src/public-api";
+import {
+  DataTableHeaderComponent,
+  DataTableFooterComponent,
+  DataTableInputSearchComponent,
+} from '../../../ng-data-table/src/public-api';
 import { DateTime } from 'luxon';
 
 interface Game {
@@ -17,9 +21,14 @@ interface Game {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [DataTableComponent, DataTableHeaderComponent, DataTableFooterComponent, DataTableInputSearchComponent],
+  imports: [
+    DataTableComponent,
+    DataTableHeaderComponent,
+    DataTableFooterComponent,
+    DataTableInputSearchComponent,
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent {
   public readonly title = 'Démo NgxDataTable';
@@ -31,35 +40,35 @@ export class AppComponent {
       isVisible: true,
       isBold: true,
       isSortable: true,
-      isClickable: true
+      isClickable: true,
     },
     {
       headerName: 'Description',
       field: 'description',
       isVisible: true,
-      isEllipsis: true
+      isEllipsis: true,
     },
     {
       headerName: 'Date de création',
       field: 'creationDate',
       isVisible: true,
       isDate: true,
-      isSortable: true
+      isSortable: true,
     },
     {
       headerName: 'Tags',
       field: 'tags',
-      isVisible: true
+      isVisible: true,
     },
     {
       headerName: 'Note',
       field: 'rating',
       isVisible: true,
-      isSortable: true
-    }
+      isSortable: true,
+    },
   ]);
 
-  public onRowClick(event: any) {
+  public onRowClick(event: unknown) {
     console.log('Ligne cliquée:', event);
   }
 
@@ -67,7 +76,7 @@ export class AppComponent {
     console.log(value);
   }
 
-  public sortDataSource(event: { field: string, direction: 'asc' | 'desc', col: colDef }): void {
+  public sortDataSource(event: { field: string; direction: 'asc' | 'desc'; col: colDef }): void {
     const sortedGames = [...this.games()].sort((a: Game, b: Game) => {
       const comparison = this.compareValues(a[event.field], b[event.field], event.col.isDate);
       return event.direction === 'asc' ? comparison : -comparison;
@@ -76,7 +85,11 @@ export class AppComponent {
     this.games.set(sortedGames);
   }
 
-  private compareValues(valueA: string | number | string[], valueB: string | number | string[], isDate?: boolean): number {
+  private compareValues(
+    valueA: string | number | string[],
+    valueB: string | number | string[],
+    isDate?: boolean,
+  ): number {
     if (isDate && typeof valueA === 'string' && typeof valueB === 'string') {
       return this.compareDates(valueA, valueB);
     }
@@ -93,10 +106,12 @@ export class AppComponent {
     return 0;
   }
 
-  private comparePrimitives(valueA: string | number | string[], valueB: string | number | string[]): number {
+  private comparePrimitives(
+    valueA: string | number | string[],
+    valueB: string | number | string[],
+  ): number {
     if (valueA < valueB) return -1;
     if (valueA > valueB) return 1;
     return 0;
   }
-
 }

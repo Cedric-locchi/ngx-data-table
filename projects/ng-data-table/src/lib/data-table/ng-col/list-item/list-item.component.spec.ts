@@ -17,19 +17,17 @@ describe('ListItemComponent', () => {
     storeSubject = new BehaviorSubject<listState>({
       data: [],
       state: { isCollapsed: false },
-      rowState: { field: null, isCollapsed: null, rowId: null }
+      rowState: { field: null, isCollapsed: null, rowId: null },
     });
 
     mockListManager = {
       store: storeSubject,
-      getDataByKey: vi.fn()
+      getDataByKey: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
       imports: [ListItemComponent],
-      providers: [
-        { provide: ListManager, useValue: mockListManager }
-      ]
+      providers: [{ provide: ListManager, useValue: mockListManager }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ListItemComponent);
@@ -43,7 +41,7 @@ describe('ListItemComponent', () => {
     fixture.componentRef.setInput('col', {
       headerName: 'Name',
       field: 'name',
-      isClickable: false
+      isClickable: false,
     } satisfies colDef);
   });
 
@@ -78,13 +76,13 @@ describe('ListItemComponent', () => {
 
     const event = {
       currentTarget: mockElement,
-      toElement: mockElement
+      toElement: mockElement,
     };
 
     fixture.componentRef.setInput('col', {
       headerName: 'Name',
       field: 'name',
-      isClickable: true
+      isClickable: true,
     } satisfies colDef);
 
     component.hoverLine(event);
@@ -100,7 +98,7 @@ describe('ListItemComponent', () => {
     document.body.appendChild(mockElement);
 
     const event = {
-      currentTarget: mockElement
+      currentTarget: mockElement,
     };
 
     component.removeHoveredLine(event);
@@ -115,7 +113,7 @@ describe('ListItemComponent', () => {
       storeSubject.next({
         data: [{ isCollapsible: true }],
         state: { isCollapsed: false },
-        rowState: { field: null, isCollapsed: null, rowId: null }
+        rowState: { field: null, isCollapsed: null, rowId: null },
       });
 
       fixture.componentRef.setInput('index', 0);
@@ -130,13 +128,14 @@ describe('ListItemComponent', () => {
 
   it('should handle col with template in ngAfterViewInit', () => {
     class MockTemplateComponent extends BaseListItemComponent {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       override ngOnInit(): void {}
     }
 
     const colWithTemplate: colDef = {
       headerName: 'Name',
       field: 'name',
-      template: MockTemplateComponent as Type<BaseListItemComponent>
+      template: MockTemplateComponent as Type<BaseListItemComponent>,
     };
 
     fixture.componentRef.setInput('col', colWithTemplate);

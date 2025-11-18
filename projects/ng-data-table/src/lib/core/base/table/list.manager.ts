@@ -1,22 +1,29 @@
 import { Injectable } from '@angular/core';
-import {dynamic} from '../../types/dynamic';
-import {BehaviorSubject} from 'rxjs';
+import { dynamic } from '../../types/dynamic';
+import { BehaviorSubject } from 'rxjs';
 
-export type listState = {
-	data: dynamic[];
-	state: state;
-	rowState: rowState;
-};
+export interface listState {
+  data: dynamic[];
+  state: state;
+  rowState: rowState;
+}
 
-type rowState = { field: string | null; isCollapsed: boolean | null; rowId: number | null };
-type state = { isCollapsed: boolean };
+interface rowState {
+  field: string | null;
+  isCollapsed: boolean | null;
+  rowId: number | null;
+}
+interface state {
+  isCollapsed: boolean;
+}
 
 @Injectable({
-	providedIn: 'root',
+  providedIn: 'root',
 })
 export class ListManager {
-
-  public readonly store: BehaviorSubject<listState> = new BehaviorSubject<listState>({} as listState);
+  public readonly store: BehaviorSubject<listState> = new BehaviorSubject<listState>(
+    {} as listState,
+  );
 
   constructor() {
     const state = { isCollapsed: false };
@@ -31,15 +38,14 @@ export class ListManager {
   }
 
   public saveData(data: dynamic[]): void {
-   const state = this.store.getValue();
+    const state = this.store.getValue();
     state.data = data;
     this.store.next(state);
   }
 
-	public getDataByKey(key: string): unknown[] {
-		return this.store.getValue().data.map((row: dynamic) => {
-			return row[key];
-		});
-	}
-
+  public getDataByKey(key: string): unknown[] {
+    return this.store.getValue().data.map((row: dynamic) => {
+      return row[key];
+    });
+  }
 }

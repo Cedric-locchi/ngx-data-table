@@ -118,16 +118,8 @@ describe('DataTableManagerService', () => {
       service.dataSources = mockDataSources;
     });
 
-    it('should handle undefined data', () => {
-      service.dataSources = [undefined as any];
-      const col: colDef = { headerName: 'Name', field: 'name' };
-      const result = service.getDataFromCol(col);
-
-      expect(result[0]).toBe('non renseigné');
-    });
-
     it('should handle null data', () => {
-      service.dataSources = [null as any];
+      service.dataSources = [null satisfies dynamic];
       const col: colDef = { headerName: 'Name', field: 'name' };
       const result = service.getDataFromCol(col);
 

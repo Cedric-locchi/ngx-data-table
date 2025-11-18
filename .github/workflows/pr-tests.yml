@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v3
@@ -72,8 +72,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v3
@@ -96,10 +96,8 @@ jobs:
             echo "bump_type=major" >> $GITHUB_OUTPUT
           elif echo "$COMMIT_MSG" | grep -qiE '\[minor\]|\bminor:'; then
             echo "bump_type=minor" >> $GITHUB_OUTPUT
-          elif echo "$COMMIT_MSG" | grep -qiE '\[patch\]|\bpatch:|\bfix:'; then
-            echo "bump_type=patch" >> $GITHUB_OUTPUT
           else
-            echo "bump_type=none" >> $GITHUB_OUTPUT
+            echo "bump_type=patch" >> $GITHUB_OUTPUT
           fi
 
       - name: Bump version

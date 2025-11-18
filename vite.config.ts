@@ -12,9 +12,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       angular({
-        tsconfig: mode === 'test'
-          ? `./${projectPath}/tsconfig.spec.json`
-          : './tsconfig.json',
+        tsconfig: mode === 'test' ? `./${projectPath}/tsconfig.spec.json` : './tsconfig.json',
       }),
       viteTsConfigPaths(),
     ],
