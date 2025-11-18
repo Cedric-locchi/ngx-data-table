@@ -10,6 +10,7 @@ import {
   Signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { nanoid } from 'nanoid';
 import { searchConfigSchema, searchTermSchema } from '../../core';
 
 @Component({
@@ -20,9 +21,14 @@ import { searchConfigSchema, searchTermSchema } from '../../core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataTableInputSearchComponent implements OnInit {
+  public readonly appearance: InputSignal<'filled' | 'outlined'> = input<'filled' | 'outlined'>(
+    'filled',
+  );
+  public readonly label: InputSignal<string> = input<string>('');
   public readonly placeholder: InputSignal<string> = input('Rechercher...');
   public readonly searchControl: FormControl = new FormControl('');
   public readonly searchTerm: OutputEmitterRef<string> = output<string>();
+  public readonly inputId = 'search-input-' + nanoid();
 
   public readonly validatedPlaceholder: Signal<string> = computed(() => {
     const placeholderValue = this.placeholder();
@@ -30,7 +36,7 @@ export class DataTableInputSearchComponent implements OnInit {
 
     if (!result.success) {
       console.error('Invalid search configuration:', result.error);
-      throw new Error(`Invalid search placeholder: ${result.error.message}`);
+      throw new Error(`Invalid search placeholder: ${result.error.message} `);
     }
 
     return result.data.placeholder;

@@ -328,6 +328,32 @@ describe('DataTableComponent', () => {
       expect(dragEvent.dataTransfer?.setData).toHaveBeenCalledWith('text/plain', 'col1');
       expect(dragEvent.dataTransfer?.effectAllowed).toBe('move');
     });
+
+    it('should update dragOverColumn on drag enter', () => {
+      const dragEvent = {
+        preventDefault: vi.fn(),
+      } as unknown as DragEvent;
+      const col = { field: 'col1', headerName: 'Col 1' } as colDef;
+
+      component.onDragEnter(dragEvent, col);
+
+      expect(component.dragOverColumn()).toBe('col1');
+    });
+
+    it('should clear dragOverColumn on drop', () => {
+      component.dragOverColumn.set('col1');
+      const dragEvent = {
+        preventDefault: vi.fn(),
+        dataTransfer: {
+          getData: vi.fn().mockReturnValue('col1'),
+        },
+      } as unknown as DragEvent;
+      const targetCol = { field: 'col1', headerName: 'Col 1' } as colDef;
+
+      component.onDrop(dragEvent, targetCol);
+
+      expect(component.dragOverColumn()).toBeNull();
+    });
     describe('Column State', () => {
       it('should emit columnStateChange when visibility changes', () => {
         const spy = vi.fn();

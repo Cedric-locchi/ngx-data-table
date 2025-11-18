@@ -1,0 +1,54 @@
+<div class="dt-pagination-container">
+  <div class="dt-pagination-info">
+    Showing {{ startItem() }} - {{ endItem() }} of {{ totalItems() }}
+  </div>
+
+  <div class="dt-pagination-controls">
+    <div class="dt-page-size-selector">
+      Rows per page:
+      <select [value]="pageSize()" (change)="onPageSizeChange($event)">
+        @for (option of pageSizeOptions(); track option) {
+          <option [value]="option">{{ option }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="dt-pagination-actions">
+      <button
+        class="dt-pagination-btn"
+        [disabled]="currentPage() === 1"
+        (click)="onPageChange(1)"
+        title="First Page"
+      >
+        <fa-icon [icon]="faAngleDoubleLeft"></fa-icon>
+      </button>
+      <button
+        class="dt-pagination-btn"
+        [disabled]="currentPage() === 1"
+        (click)="onPageChange(currentPage() - 1)"
+        title="Previous Page"
+      >
+        <fa-icon [icon]="faChevronLeft"></fa-icon>
+      </button>
+
+      <span class="dt-current-page"> Page {{ currentPage() }} of {{ totalPages() }} </span>
+
+      <button
+        class="dt-pagination-btn"
+        [disabled]="currentPage() === totalPages()"
+        (click)="onPageChange(currentPage() + 1)"
+        title="Next Page"
+      >
+        <fa-icon [icon]="faChevronRight"></fa-icon>
+      </button>
+      <button
+        class="dt-pagination-btn"
+        [disabled]="currentPage() === totalPages()"
+        (click)="onPageChange(totalPages())"
+        title="Last Page"
+      >
+        <fa-icon [icon]="faAngleDoubleRight"></fa-icon>
+      </button>
+    </div>
+  </div>
+</div>

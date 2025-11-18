@@ -1,22 +1,22 @@
 .col-item {
   display: flex;
   align-items: center;
-  font-family: 'Euclid triangle', sans-serif;
-  border-bottom: 1px solid #c9dae8;
+  font-family: var(--dt-font-family);
+  border-bottom: 1px solid var(--dt-row-border-bottom);
   box-sizing: border-box;
-  min-height: 48px;
-  height: 48px;
-  max-height: 48px;
+  min-height: var(--dt-row-height);
+  height: var(--dt-row-height);
+  max-height: var(--dt-row-height);
   min-width: 20px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding-left: 12px;
-  padding-right: 12px;
+  padding-left: var(--dt-cell-padding);
+  padding-right: var(--dt-cell-padding);
 
   span {
-    font-size: 13px;
-    color: #003c67;
+    font-size: var(--dt-row-font-size);
+    color: var(--dt-row-text-color);
     font-weight: 400;
   }
 
@@ -30,7 +30,7 @@
 }
 
 .hovered {
-  background-color: #f6f8f9;
+  background-color: var(--dt-row-hover-bg);
 }
 
 .clickable {
@@ -38,7 +38,7 @@
 }
 
 .odd {
-  background-color: #f6f8f9;
+  background-color: var(--dt-row-odd-bg);
 }
 
 .bold {

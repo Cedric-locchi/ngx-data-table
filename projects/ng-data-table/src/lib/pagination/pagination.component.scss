@@ -1,0 +1,84 @@
+.dt-pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dt-cell-padding, 12px);
+  border-top: 1px solid var(--dt-border-color, #dfe9f1);
+  background-color: var(--dt-bg-color, white);
+  color: var(--dt-text-color, #212121);
+  font-family: var(--dt-font-family, sans-serif);
+  font-size: var(--dt-row-font-size, 13px);
+}
+
+.dt-pagination-info {
+  color: var(--dt-header-text-color, #6b7280);
+}
+
+.dt-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.dt-page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dt-header-text-color, #6b7280);
+
+  select {
+    padding: 4px 8px;
+    border: 1px solid var(--dt-input-border, #ccc);
+    border-radius: var(--dt-border-radius, 4px);
+    background-color: var(--dt-bg-color, white);
+    color: var(--dt-text-color, #212121);
+    font-size: inherit;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--dt-input-focus-border, #66afe9);
+      box-shadow: 0 0 0 2px var(--dt-input-focus-shadow, rgba(102, 175, 233, 0.2));
+    }
+  }
+}
+
+.dt-pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dt-pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: var(--dt-border-radius, 4px);
+  background-color: transparent;
+  color: var(--dt-text-color, #212121);
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: var(--dt-btn-hover-bg, #f8fafc);
+  }
+
+  &:disabled {
+    color: var(--dt-no-data-text-color, #ccc);
+    cursor: not-allowed;
+  }
+
+  fa-icon {
+    font-size: 12px;
+  }
+}
+
+.dt-current-page {
+  margin: 0 8px;
+  font-weight: 500;
+}

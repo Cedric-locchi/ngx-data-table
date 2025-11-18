@@ -12,9 +12,12 @@
           @for (col of allColDefOrdered(); track col.field) {
             <div
               class="dropdown-item"
+              [style.view-transition-name]="'menu-item-' + componentId + '-' + col.field"
+              [class.drag-over]="dragOverColumn() === col.field"
               draggable="true"
               (dragstart)="onDragStart($event, col)"
               (dragover)="onDragOver($event)"
+              (dragenter)="onDragEnter($event, col)"
               (drop)="onDrop($event, col)"
             >
               <div class="drag-handle">
@@ -35,7 +38,7 @@
   <div class="list" [class.border]="displayBorder()">
     <div class="body">
       @for (col of colDefVisible(); track col; let i = $index; let f = $first) {
-        <div class="col">
+        <div class="col" [style.view-transition-name]="'col-' + componentId + '-' + col.field">
           @for (item of dataTableManager.getDataFromCol(col); track $index) {
             <ng-list-header [f]="$first" [col]="col" (isSortable)="sortByColumn($event)" />
 
@@ -55,4 +58,12 @@
       }
     </div>
   </div>
+  <dt-pagination
+    [totalItems]="totalItems()"
+    [pageSize]="pageSize()"
+    [currentPage]="currentPage()"
+    [pageSizeOptions]="pageSizeOptions()"
+    (pageChange)="pageChange.emit($event)"
+    (pageSizeChange)="pageSizeChange.emit($event)"
+  />
 </div>
