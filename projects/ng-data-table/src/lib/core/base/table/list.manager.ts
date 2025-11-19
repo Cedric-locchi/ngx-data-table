@@ -1,9 +1,7 @@
-import { Injectable } from '@angular/core';
-import { dynamic } from '../../types/dynamic';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 
-export interface listState {
-  data: dynamic[];
+export interface listState<T = Record<string, unknown>> {
+  data: T[];
   state: state;
   rowState: rowState;
 }
@@ -20,32 +18,30 @@ interface state {
 @Injectable({
   providedIn: 'root',
 })
-export class ListManager {
-  public readonly store: BehaviorSubject<listState> = new BehaviorSubject<listState>(
-    {} as listState,
-  );
-
-  constructor() {
-    const state = { isCollapsed: false };
-    const rowState = { field: null, isCollapsed: null, rowId: null };
-    this.store.next({ data: [], state, rowState });
-  }
+export class ListManager<T extends Record<string, unknown> = Record<string, unknown>> {
+  public readonly store: WritableSignal<listState<T>> = signal<listState<T>>({
+    data: [],
+    state: { isCollapsed: false },
+    rowState: { field: null, isCollapsed: null, rowId: null },
+  });
 
   public saveRowState(row: rowState): void {
-    const state = this.store.getValue();
-    state.rowState = row;
-    this.store.next(state);
+    this.store.update((state) => ({
+      ...state,
+      rowState: row,
+    }));
   }
 
-  public saveData(data: dynamic[]): void {
-    const state = this.store.getValue();
-    state.data = data;
-    this.store.next(state);
+  public saveData(data: T[]): void {
+    this.store.update((state) => ({
+      ...state,
+      data: data,
+    }));
   }
 
   public getDataByKey(key: string): unknown[] {
-    return this.store.getValue().data.map((row: dynamic) => {
-      return row[key];
+    return this.store().data.map((row: T) => {
+      return row?.[key];
     });
   }
 }

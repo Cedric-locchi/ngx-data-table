@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ListItemComponent } from './list-item.component';
 import { ListManager, listState } from '../../../core/base/table/list.manager';
 import { colDef } from '../../../core/types/coldef';
-import { BehaviorSubject } from 'rxjs';
-import { Type } from '@angular/core';
+import { Component, signal, WritableSignal } from '@angular/core';
+import { By } from '@angular/platform-browser';
 import { BaseListItemComponent } from '../../../core/base/table/base-list-item.component';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -11,17 +11,17 @@ describe('ListItemComponent', () => {
   let component: ListItemComponent;
   let fixture: ComponentFixture<ListItemComponent>;
   let mockListManager: Partial<ListManager>;
-  let storeSubject: BehaviorSubject<listState>;
+  let storeSignal: WritableSignal<listState>;
 
   beforeEach(async () => {
-    storeSubject = new BehaviorSubject<listState>({
+    storeSignal = signal<listState>({
       data: [],
       state: { isCollapsed: false },
       rowState: { field: null, isCollapsed: null, rowId: null },
     });
 
     mockListManager = {
-      store: storeSubject,
+      store: storeSignal,
       getDataByKey: vi.fn(),
     };
 
@@ -66,84 +66,83 @@ describe('ListItemComponent', () => {
 
     component.selectItem(5);
 
-    expect(emitSpy).toHaveBeenCalledWith(5);
-  });
-
-  it('should add hovered class on hoverLine', () => {
-    const mockElement = document.createElement('div');
-    mockElement.classList.add('test-class');
-    document.body.appendChild(mockElement);
-
-    const event = {
-      currentTarget: mockElement,
-      toElement: mockElement,
-    };
-
-    fixture.componentRef.setInput('col', {
-      headerName: 'Name',
-      field: 'name',
-      isClickable: true,
-    } satisfies colDef);
-
-    component.hoverLine(event);
-
-    expect(mockElement.classList.contains('hovered')).toBe(true);
-
-    document.body.removeChild(mockElement);
-  });
-
-  it('should remove hovered class on removeHoveredLine', () => {
-    const mockElement = document.createElement('div');
-    mockElement.classList.add('test-class', 'hovered');
-    document.body.appendChild(mockElement);
-
-    const event = {
-      currentTarget: mockElement,
-    };
-
-    component.removeHoveredLine(event);
-
-    expect(mockElement.classList.contains('hovered')).toBe(false);
-
-    document.body.removeChild(mockElement);
-  });
-
-  it('should update rowStateCollapsed from ListManager store on ngOnInit', () => {
-    return new Promise<void>((resolve) => {
-      storeSubject.next({
-        data: [{ isCollapsible: true }],
-        state: { isCollapsed: false },
-        rowState: { field: null, isCollapsed: null, rowId: null },
-      });
-
-      fixture.componentRef.setInput('index', 0);
-      component.ngOnInit();
-
-      setTimeout(() => {
-        expect(component.rowStateCollapsed()).toBe(true);
-        resolve();
-      }, 100);
+    expect(emitSpy).toHaveBeenCalledWith({
+      index: 5,
+      col: component.col(),
     });
   });
 
-  it('should handle col with template in ngAfterViewInit', () => {
-    class MockTemplateComponent extends BaseListItemComponent {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      override ngOnInit(): void {}
-    }
+  it('should update rowStateCollapsed from ListManager store reactively', () => {
+    // Update the store signal with data that has isCollapsible
+    storeSignal.set({
+      data: [{ isCollapsible: true }],
+      state: { isCollapsed: false },
+      rowState: { field: null, isCollapsed: null, rowId: null },
+    });
 
+    fixture.componentRef.setInput('index', 0);
+    fixture.detectChanges();
+
+    // The effect should have run automatically and updated rowStateCollapsed
+    expect(component.rowStateCollapsed()).toBe(true);
+  });
+
+  @Component({
+    template: '<div class="mock-item">Mock Item</div>',
+    standalone: true,
+  })
+  class MockItemComponent extends BaseListItemComponent {}
+
+  it('should create component from template and set instance properties', () => {
     const colWithTemplate: colDef = {
       headerName: 'Name',
       field: 'name',
-      template: MockTemplateComponent as Type<BaseListItemComponent>,
+      template: MockItemComponent,
     };
 
     fixture.componentRef.setInput('col', colWithTemplate);
+    fixture.componentRef.setInput('index', 123);
 
-    const containerRef = component.container();
-    expect(containerRef).toBeUndefined();
+    // Trigger change detection to run ngAfterViewInit
+    fixture.detectChanges();
 
-    expect(component.col().template).toBeDefined();
-    expect(component.col().template).toBe(MockTemplateComponent);
+    // Verify container is available
+    expect(component.container()).toBeDefined();
+
+    // Verify the component was created
+    const mockItemDebugEl = fixture.debugElement.query(By.directive(MockItemComponent));
+    expect(mockItemDebugEl).toBeTruthy();
+
+    // Verify instance properties were set
+    const mockItemInstance = mockItemDebugEl.componentInstance as MockItemComponent;
+    expect(mockItemInstance.rowId).toBe(123);
+    expect(mockItemInstance.col).toBe(colWithTemplate);
+  });
+
+  it('should execute BaseListItemComponent logic correctly', () => {
+    const colWithTemplate: colDef = {
+      headerName: 'Name',
+      field: 'name',
+      template: MockItemComponent,
+    };
+
+    fixture.componentRef.setInput('col', colWithTemplate);
+    fixture.componentRef.setInput('index', 0);
+
+    // Setup data in store for index 0 to trigger the if block in BaseListItemComponent effect
+    storeSignal.set({
+      data: [{ id: 1, name: 'Test Data' }],
+      state: { isCollapsed: false },
+      rowState: { field: null, isCollapsed: null, rowId: null },
+    });
+
+    fixture.detectChanges();
+
+    const mockItemDebugEl = fixture.debugElement.query(By.directive(MockItemComponent));
+    const mockItemInstance = mockItemDebugEl.componentInstance as MockItemComponent;
+
+    // Verify getDataFromKey calls ListManager
+    mockItemInstance.getDataFromKey('name');
+    expect(mockListManager.getDataByKey).toHaveBeenCalledWith('name');
   });
 });

@@ -12,11 +12,8 @@ export const colDefSchema = z.object({
   isEllipsis: z.boolean().optional(),
   isClickable: z.boolean().optional(),
   isSortable: z.boolean().optional(),
-  template: z
-    .custom<
-      Type<BaseListItemComponent>
-    >((val) => typeof val === 'function', { message: 'template must be an Angular component class' })
-    .optional(),
 });
 
-export type colDef = z.infer<typeof colDefSchema>;
+export type colDef = z.infer<typeof colDefSchema> & {
+  template?: Type<BaseListItemComponent>;
+};

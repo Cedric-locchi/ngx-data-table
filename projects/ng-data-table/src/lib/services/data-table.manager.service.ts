@@ -1,28 +1,23 @@
-import { Injectable, signal, WritableSignal } from '@angular/core';
+import { computed, inject, Injectable, Signal } from '@angular/core';
 import { DateTime } from 'luxon';
-import { colDef, dynamic } from '../core';
+import { colDef, ListManager } from '../core';
 
 @Injectable({
   providedIn: 'root',
 })
-export class DataTableManagerService {
-  public _dataSources: WritableSignal<dynamic[]> = signal([]);
+export class DataTableManagerService<T extends Record<string, unknown> = Record<string, unknown>> {
+  private readonly listManager = inject(ListManager<T>);
 
-  public set dataSources(value: dynamic[]) {
-    this._dataSources.set(value);
-  }
-
-  public get dataSources(): dynamic[] {
-    return this._dataSources();
-  }
+  // Computed signal qui lit depuis ListManager - source unique de vérité
+  public readonly dataSources: Signal<T[]> = computed(() => this.listManager.store().data);
 
   public getDataFromCol(col: colDef): string[] {
-    return this.dataSources.map((row) => {
+    return this.dataSources().map((row) => {
       return this.dataFromCol(row, col);
     });
   }
 
-  private dataFromCol(data: dynamic, col: colDef): string {
+  private dataFromCol(data: T, col: colDef): string {
     if (data === undefined || data === null) {
       return 'non renseigné';
     }

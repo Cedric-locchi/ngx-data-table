@@ -8,4 +8,8 @@ export const rowClickedSchema = z.object({
   row: dynamicSchema,
 });
 
-export type rowClicked = z.infer<typeof rowClickedSchema>;
+export interface rowClicked<T = Record<string, unknown>> {
+  col: z.infer<typeof colDefSchema>;
+  index: number;
+  row: T;
+}
