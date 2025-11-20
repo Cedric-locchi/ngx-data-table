@@ -1,15 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DataTableComponent } from './data-table.component';
+import { colDef, dynamic, ListManager } from '../core';
 import { DataTableManagerService } from '../services';
-import { ListManager } from '../core';
-import { colDef, dynamic } from '../core';
-import { SimpleChange } from '@angular/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('DataTableComponent', () => {
   let component: DataTableComponent;
   let fixture: ComponentFixture<DataTableComponent>;
-  let dataTableManager: DataTableManagerService;
   let listManager: ListManager;
 
   const mockColDefs: colDef[] = [
@@ -32,7 +29,6 @@ describe('DataTableComponent', () => {
 
     fixture = TestBed.createComponent(DataTableComponent);
     component = fixture.componentInstance;
-    dataTableManager = TestBed.inject(DataTableManagerService);
     listManager = TestBed.inject(ListManager);
 
     fixture.componentRef.setInput('dataSources', mockDataSources);
@@ -76,7 +72,7 @@ describe('DataTableComponent', () => {
   describe('colDefVisible', () => {
     it('should return only visible columns', () => {
       fixture.detectChanges();
-      const visibleCols = component.colDefVisible;
+      const visibleCols = component.colDefVisible();
       expect(visibleCols).toHaveLength(3);
       expect(visibleCols.every((col) => col.isVisible)).toBe(true);
       expect(visibleCols.find((col) => col.field === 'hidden')).toBeUndefined();
@@ -130,35 +126,26 @@ describe('DataTableComponent', () => {
     });
   });
 
-  describe('ngOnChanges', () => {
-    it('should save data to listManager when dataSources change', () => {
-      const saveDataSpy = vi.spyOn(listManager, 'saveData');
+  describe('data synchronization', () => {
+    it('should synchronize data to ListManager via effect', () => {
+      const newData: dynamic[] = [{ id: 99, name: 'New Data' }];
 
-      component.ngOnChanges({
-        dataSources: new SimpleChange(null, mockDataSources, true),
-      });
+      fixture.componentRef.setInput('dataSources', newData);
+      fixture.detectChanges();
 
-      expect(saveDataSpy).toHaveBeenCalledWith(mockDataSources);
-    });
-
-    it('should update dataTableManager.dataSources when dataSources change', () => {
-      component.ngOnChanges({
-        dataSources: new SimpleChange(null, mockDataSources, true),
-      });
-
-      expect(dataTableManager.dataSources).toEqual(mockDataSources);
+      expect(listManager.store().data).toEqual(newData);
     });
   });
 
   describe('clicked', () => {
     it('should emit rowIsClicked with correct data when clickable column exists', () => {
       fixture.detectChanges();
-      dataTableManager.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
 
       const spy = vi.fn();
       component.rowIsClicked.subscribe(spy);
 
-      component.clicked(0);
+      component.clicked({ index: 0, col: mockColDefs[3] }); // Use the clickable column
 
       expect(spy).toHaveBeenCalledWith({
         col: mockColDefs[3], // The clickable column
@@ -167,35 +154,35 @@ describe('DataTableComponent', () => {
       });
     });
 
-    it('should not emit rowIsClicked when no clickable column exists', () => {
-      const colDefsWithoutClickable: colDef[] = [
+    it('should not emit rowIsClicked when column is not clickable', () => {
+      const mockColDefs: colDef[] = [
         { headerName: 'Name', field: 'name', isVisible: true },
         { headerName: 'Email', field: 'email', isVisible: true },
       ];
 
-      fixture.componentRef.setInput('colDef', colDefsWithoutClickable);
+      fixture.componentRef.setInput('colDef', mockColDefs);
       fixture.detectChanges();
-      dataTableManager.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
 
       const spy = vi.fn();
       component.rowIsClicked.subscribe(spy);
 
-      component.clicked(0);
+      component.clicked({ index: 0, col: mockColDefs[0] });
 
       expect(spy).not.toHaveBeenCalled();
     });
 
     it('should emit with correct index for different rows', () => {
       fixture.detectChanges();
-      dataTableManager.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
 
       const spy = vi.fn();
       component.rowIsClicked.subscribe(spy);
 
-      component.clicked(1);
+      component.clicked({ index: 1, col: mockColDefs[3] }); // Use the clickable column
 
       expect(spy).toHaveBeenCalledWith({
-        col: mockColDefs[3],
+        col: mockColDefs[3], // The clickable column
         index: 1,
         row: mockDataSources[1],
       });
@@ -210,7 +197,7 @@ describe('DataTableComponent', () => {
 
       expect(component.isStripped()).toBe(true);
       expect(component.displayBorder()).toBe(true);
-      expect(component.colDefVisible).toHaveLength(3);
+      expect(component.colDefVisible()).toHaveLength(3);
     });
 
     it('should maintain sort direction across multiple sorts', () => {

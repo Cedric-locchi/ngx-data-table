@@ -11,20 +11,18 @@
   padding: 0 12px;
   position: sticky;
   top: 0;
-  color: #688EAD;
+  color: #688ead;
   font-size: 13px;
   font-weight: 500;
   background-color: white;
-  border-bottom: 1px solid #DFE9F1;
+  border-bottom: 1px solid #dfe9f1;
   z-index: 1;
 
   fa-icon {
-    color: #688EAD;
+    color: #688ead;
 
     &:hover {
       cursor: pointer;
     }
-
   }
-
 }

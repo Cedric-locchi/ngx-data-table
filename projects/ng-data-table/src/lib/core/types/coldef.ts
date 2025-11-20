@@ -1,7 +1,8 @@
-import {Type} from '@angular/core';
-import {BaseListItemComponent} from '../base/table/base-list-item.component';
-import {z} from 'zod';
+import { Type } from '@angular/core';
+import { BaseListItemComponent } from '../base/table/base-list-item.component';
+import { z } from 'zod';
 
+// Schema complet incluant la validation du template
 export const colDefSchema = z.object({
   headerName: z.string(),
   field: z.string(),
@@ -12,10 +13,24 @@ export const colDefSchema = z.object({
   isEllipsis: z.boolean().optional(),
   isClickable: z.boolean().optional(),
   isSortable: z.boolean().optional(),
-  template: z.custom<Type<BaseListItemComponent>>(
-    (val) => typeof val === 'function',
-    { message: 'template must be an Angular component class' }
-  ).optional(),
+  template: z
+    .custom<Type<BaseListItemComponent>>(
+      (val) => {
+        if (typeof val !== 'function') {
+          return false;
+        }
+
+        if (!val.prototype) {
+          return false;
+        }
+
+        return true;
+      },
+      {
+        message: 'template must be a valid Angular component Type extending BaseListItemComponent',
+      },
+    )
+    .optional(),
 });
 
 export type colDef = z.infer<typeof colDefSchema>;

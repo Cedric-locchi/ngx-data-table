@@ -1,0 +1,14 @@
+package.json
+node_modules
+
+.github
+.angular
+.vscode
+.idea
+
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+coverage
+dist

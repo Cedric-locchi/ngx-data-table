@@ -1,29 +1,28 @@
-import {Injectable, signal, WritableSignal} from '@angular/core';
-import {DateTime} from 'luxon';
-import {colDef, dynamic} from '../core';
+import { computed, inject, Injectable, Signal } from '@angular/core';
+import { DateTime } from 'luxon';
+import { colDef, colDefSchema, ListManager } from '../core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class DataTableManagerService {
+export class DataTableManagerService<T extends Record<string, unknown> = Record<string, unknown>> {
+  private readonly listManager = inject(ListManager<T>);
 
-  public _dataSources: WritableSignal<dynamic[]> = signal([]);
-
-  public set dataSources(value: dynamic[]) {
-    this._dataSources.set(value);
-  }
-
-  public get dataSources(): dynamic[] {
-    return this._dataSources();
-  }
+  public readonly dataSources: Signal<T[]> = computed(() => this.listManager.store().data);
 
   public getDataFromCol(col: colDef): string[] {
-    return this.dataSources.map(row => {
-      return this.dataFromCol(row, col);
+    const result = colDefSchema.safeParse(col);
+    if (!result.success) {
+      console.error('Invalid column definition in getDataFromCol:', result.error);
+      throw new Error(`Invalid column definition: ${result.error.message}`);
+    }
+
+    return this.dataSources().map((row) => {
+      return this.dataFromCol(row, result.data);
     });
   }
 
-  private dataFromCol(data: dynamic, col: colDef): string {
+  private dataFromCol(data: T, col: colDef): string {
     if (data === undefined || data === null) {
       return 'non renseigné';
     }
@@ -34,6 +33,11 @@ export class DataTableManagerService {
       return 'non renseigné';
     }
 
+    // Arrays should be handled by custom templates, not converted to strings
+    if (Array.isArray(value)) {
+      return '';
+    }
+
     if (col.isDate) {
       const dateValue = typeof value === 'string' ? value : String(value);
       const date = DateTime.fromISO(dateValue).toLocaleString(DateTime.DATE_SHORT);
@@ -42,5 +46,4 @@ export class DataTableManagerService {
 
     return String(value);
   }
-
 }

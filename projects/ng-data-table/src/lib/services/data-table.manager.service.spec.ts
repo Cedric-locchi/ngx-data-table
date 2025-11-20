@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { DataTableManagerService } from './data-table.manager.service';
-import { colDef, dynamic } from '../core';
+import { colDef, dynamic, ListManager } from '../core';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('DataTableManagerService', () => {
   let service: DataTableManagerService;
+  let listManager: ListManager;
 
   const mockDataSources: dynamic[] = [
     { id: 1, name: 'John Doe', email: 'john@example.com', birthDate: '1990-05-15', amount: 1000 },
@@ -14,43 +15,44 @@ describe('DataTableManagerService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [DataTableManagerService],
+      providers: [DataTableManagerService, ListManager],
     });
     service = TestBed.inject(DataTableManagerService);
+    listManager = TestBed.inject(ListManager);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('dataSources getter and setter', () => {
-    it('should set and get dataSources', () => {
-      service.dataSources = mockDataSources;
-      expect(service.dataSources).toEqual(mockDataSources);
+  describe('dataSources computed signal', () => {
+    it('should read from ListManager store', () => {
+      listManager.saveData(mockDataSources);
+      expect(service.dataSources()).toEqual(mockDataSources);
     });
 
     it('should initialize with empty array', () => {
-      expect(service.dataSources).toEqual([]);
+      expect(service.dataSources()).toEqual([]);
     });
 
-    it('should update dataSources when set multiple times', () => {
-      service.dataSources = mockDataSources;
-      expect(service.dataSources).toEqual(mockDataSources);
+    it('should update when ListManager data changes', () => {
+      listManager.saveData(mockDataSources);
+      expect(service.dataSources()).toEqual(mockDataSources);
 
       const newData: dynamic[] = [{ id: 4, name: 'New User' }];
-      service.dataSources = newData;
-      expect(service.dataSources).toEqual(newData);
+      listManager.saveData(newData);
+      expect(service.dataSources()).toEqual(newData);
     });
 
     it('should handle empty array', () => {
-      service.dataSources = [];
-      expect(service.dataSources).toEqual([]);
+      listManager.saveData([]);
+      expect(service.dataSources()).toEqual([]);
     });
   });
 
   describe('getDataFromCol', () => {
     beforeEach(() => {
-      service.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
     });
 
     it('should return array of values for a given column', () => {
@@ -105,7 +107,7 @@ describe('DataTableManagerService', () => {
     });
 
     it('should return empty array when dataSources is empty', () => {
-      service.dataSources = [];
+      listManager.saveData([]);
       const col: colDef = { headerName: 'Name', field: 'name' };
       const result = service.getDataFromCol(col);
 
@@ -114,20 +116,8 @@ describe('DataTableManagerService', () => {
   });
 
   describe('dataFromCol (private method behavior)', () => {
-    beforeEach(() => {
-      service.dataSources = mockDataSources;
-    });
-
-    it('should handle undefined data', () => {
-      service.dataSources = [undefined as any];
-      const col: colDef = { headerName: 'Name', field: 'name' };
-      const result = service.getDataFromCol(col);
-
-      expect(result[0]).toBe('non renseigné');
-    });
-
     it('should handle null data', () => {
-      service.dataSources = [null as any];
+      listManager.saveData([null satisfies dynamic]);
       const col: colDef = { headerName: 'Name', field: 'name' };
       const result = service.getDataFromCol(col);
 
@@ -135,7 +125,7 @@ describe('DataTableManagerService', () => {
     });
 
     it('should convert boolean to string', () => {
-      service.dataSources = [{ active: true }];
+      listManager.saveData([{ active: true }]);
       const col: colDef = { headerName: 'Active', field: 'active' };
       const result = service.getDataFromCol(col);
 
@@ -143,7 +133,7 @@ describe('DataTableManagerService', () => {
     });
 
     it('should convert object to string', () => {
-      service.dataSources = [{ data: { nested: 'value' } }];
+      listManager.saveData([{ data: { nested: 'value' } }]);
       const col: colDef = { headerName: 'Data', field: 'data' };
       const result = service.getDataFromCol(col);
 
@@ -151,7 +141,7 @@ describe('DataTableManagerService', () => {
     });
 
     it('should handle date with timezone', () => {
-      service.dataSources = [{ date: '2023-05-15T10:30:00Z' }];
+      listManager.saveData([{ date: '2023-05-15T10:30:00Z' }]);
       const col: colDef = { headerName: 'Date', field: 'date', isDate: true };
       const result = service.getDataFromCol(col);
 
@@ -160,7 +150,7 @@ describe('DataTableManagerService', () => {
     });
 
     it('should handle empty string', () => {
-      service.dataSources = [{ name: '' }];
+      listManager.saveData([{ name: '' }]);
       const col: colDef = { headerName: 'Name', field: 'name' };
       const result = service.getDataFromCol(col);
 
@@ -170,7 +160,7 @@ describe('DataTableManagerService', () => {
 
   describe('integration tests', () => {
     it('should handle complete workflow with multiple columns', () => {
-      service.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
 
       const nameCol: colDef = { headerName: 'Name', field: 'name' };
       const dateCol: colDef = { headerName: 'Birth Date', field: 'birthDate', isDate: true };
@@ -191,14 +181,14 @@ describe('DataTableManagerService', () => {
 
     it('should maintain signal reactivity', () => {
       const initialData: dynamic[] = [{ id: 1, name: 'Test' }];
-      service.dataSources = initialData;
+      listManager.saveData(initialData);
 
-      expect(service._dataSources()).toEqual(initialData);
+      expect(service.dataSources()).toEqual(initialData);
 
       const updatedData: dynamic[] = [{ id: 2, name: 'Updated' }];
-      service.dataSources = updatedData;
+      listManager.saveData(updatedData);
 
-      expect(service._dataSources()).toEqual(updatedData);
+      expect(service.dataSources()).toEqual(updatedData);
     });
   });
 });

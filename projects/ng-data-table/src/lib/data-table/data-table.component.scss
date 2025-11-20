@@ -25,10 +25,19 @@
   height: auto;
 
   &.border {
-    border: 1px solid #DFE9F1;
+    border: 1px solid #dfe9f1;
     border-radius: 8px;
     padding: 0;
-    box-shadow: 0 1px 5.3px 0 #EEF3F7;
+    box-shadow: 0 1px 5.3px 0 #eef3f7;
+  }
+
+  .header-row {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
+    background: white;
+    border-bottom: 2px solid #dfe9f1;
   }
 
   .body {
@@ -43,17 +52,15 @@
       display: flex;
       flex-direction: column;
     }
-
   }
-
 }
 
 .hovered {
-  background-color: #F8FAFC;
+  background-color: #f8fafc;
 }
 
 .odd {
-  background-color: #F8FAFC;
+  background-color: #f8fafc;
 }
 
 .bold {
@@ -61,7 +68,7 @@
 }
 
 .shadow {
-  box-shadow: 0 1px 8px 0 #E6EEF4;
+  box-shadow: 0 1px 8px 0 #e6eef4;
 }
 
 .no-data {
@@ -71,6 +78,5 @@
   height: 100%;
   width: 100%;
   font-size: 16px;
-  color: #688EAD;
+  color: #688ead;
 }
-
