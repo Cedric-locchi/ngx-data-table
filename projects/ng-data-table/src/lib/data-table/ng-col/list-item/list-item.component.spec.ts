@@ -116,7 +116,7 @@ describe('ListItemComponent', () => {
     // Verify instance properties were set
     const mockItemInstance = mockItemDebugEl.componentInstance as MockItemComponent;
     expect(mockItemInstance.rowId).toBe(123);
-    expect(mockItemInstance.col).toBe(colWithTemplate);
+    expect(mockItemInstance.col).toStrictEqual(colWithTemplate);
   });
 
   it('should execute BaseListItemComponent logic correctly', () => {

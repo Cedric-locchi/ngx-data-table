@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, Signal } from '@angular/core';
 import { DateTime } from 'luxon';
-import { colDef, ListManager } from '../core';
+import { colDef, colDefSchema, ListManager } from '../core';
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +12,15 @@ export class DataTableManagerService<T extends Record<string, unknown> = Record<
   public readonly dataSources: Signal<T[]> = computed(() => this.listManager.store().data);
 
   public getDataFromCol(col: colDef): string[] {
+    // Validate column definition
+    const result = colDefSchema.safeParse(col);
+    if (!result.success) {
+      console.error('Invalid column definition in getDataFromCol:', result.error);
+      throw new Error(`Invalid column definition: ${result.error.message}`);
+    }
+
     return this.dataSources().map((row) => {
-      return this.dataFromCol(row, col);
+      return this.dataFromCol(row, result.data);
     });
   }
 

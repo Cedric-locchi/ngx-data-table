@@ -10,7 +10,16 @@ import {
   OutputEmitterRef,
   Signal,
 } from '@angular/core';
-import { colDef, ListManager, rowClicked, sortEvent } from '../core';
+import {
+  colDef,
+  colDefSchema,
+  ListManager,
+  rowClicked,
+  rowClickedSchema,
+  sortEvent,
+  sortEventSchema,
+} from '../core';
+import { z } from 'zod';
 import { DataTableManagerService } from '../services';
 import { ListItemComponent } from './ng-col/list-item/list-item.component';
 import { ListHeaderComponent } from './ng-col/list-header/list-header.component';
@@ -37,7 +46,19 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   public readonly dataTableManager: DataTableManagerService<T> = inject(DataTableManagerService<T>);
   public readonly listManager: ListManager<T> = inject(ListManager<T>);
 
-  public readonly localColDef: Signal<colDef[]> = computed(() => this.colDef());
+  public readonly localColDef: Signal<colDef[]> = computed(() => {
+    const cols = this.colDef();
+    // Validation des colonnes
+    const result = z.array(colDefSchema).safeParse(cols);
+    if (!result.success) {
+      console.error('Invalid column definitions:', result.error);
+      // On pourrait throw une erreur ici ou retourner un tableau vide/filtré
+      // Pour l'instant on log et on retourne les données telles quelles si possible ou on throw
+      throw new Error(`Invalid column definitions: ${result.error.message}`);
+    }
+    return result.data as colDef[];
+  });
+
   public readonly colDefVisible: Signal<colDef[]> = computed(() =>
     this.localColDef().filter((col: colDef) => col.isVisible),
   );
@@ -53,13 +74,30 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     const field = col.field;
     const direction = this.sortDirection[field] === 'asc' ? 'desc' : 'asc';
     this.sortDirection[field] = direction;
-    this.sortDataSource.emit({ field, direction, col });
+
+    const event = { field, direction, col };
+    const result = sortEventSchema.safeParse(event);
+
+    if (!result.success) {
+      console.error('Invalid sort event:', result.error);
+      throw new Error(`Invalid sort event: ${result.error.message}`);
+    }
+
+    this.sortDataSource.emit(result.data);
   }
 
   public clicked(event: { index: number; col: colDef }): void {
     const row = this.listManager.store().data[event.index];
     if (event.col.isClickable) {
-      this.rowIsClicked.emit({ col: event.col, index: event.index, row: row });
+      const clickEvent = { col: event.col, index: event.index, row: row };
+      const result = rowClickedSchema.safeParse(clickEvent);
+
+      if (!result.success) {
+        console.error('Invalid row clicked event:', result.error);
+        throw new Error(`Invalid row clicked event: ${result.error.message}`);
+      }
+
+      this.rowIsClicked.emit(result.data as rowClicked<T>);
     }
   }
 }

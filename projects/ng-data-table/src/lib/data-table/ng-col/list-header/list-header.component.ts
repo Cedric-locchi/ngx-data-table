@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   InputSignal,
   output,
   OutputEmitterRef,
+  Signal,
 } from '@angular/core';
-import { colDef } from '../../../core';
+import { colDef, colDefSchema } from '../../../core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
 
@@ -20,6 +22,15 @@ import { faSort } from '@fortawesome/free-solid-svg-icons';
 export class ListHeaderComponent {
   public col: InputSignal<colDef> = input.required<colDef>();
   public f: InputSignal<boolean> = input.required<boolean>();
+
+  public readonly localCol: Signal<colDef> = computed(() => {
+    const col = this.col();
+    const result = colDefSchema.safeParse(col);
+    if (!result.success) {
+      throw new Error(`Invalid column definition: ${result.error.message}`);
+    }
+    return result.data;
+  });
 
   public isSortable: OutputEmitterRef<colDef> = output<colDef>();
 

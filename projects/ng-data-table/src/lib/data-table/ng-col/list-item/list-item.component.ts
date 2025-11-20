@@ -2,12 +2,14 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
   InputSignal,
   output,
   OutputEmitterRef,
+  Signal,
   signal,
   viewChild,
   ViewContainerRef,
@@ -15,8 +17,16 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { faChevronDown, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { BaseListItemComponent, colDef, dynamic, ListManager } from '../../../core';
+import { z } from 'zod';
 import { RowHoverDirective } from '../../directives/row-hover.directive';
+import {
+  BaseListItemComponent,
+  colDef,
+  colDefSchema,
+  dynamic,
+  dynamicSchema,
+  ListManager,
+} from '../../../core';
 
 @Component({
   selector: 'ng-list-item',
@@ -36,6 +46,24 @@ export class ListItemComponent implements AfterViewInit {
   public readonly componentId: InputSignal<string> = input.required();
   public readonly item: InputSignal<string> = input.required();
   public readonly col: InputSignal<colDef> = input.required();
+
+  public readonly localDataSource: Signal<dynamic[]> = computed(() => {
+    const data = this.dataSource();
+    const result = z.array(dynamicSchema).safeParse(data);
+    if (!result.success) {
+      throw new Error(`Invalid data source: ${result.error.message}`);
+    }
+    return result.data;
+  });
+
+  public readonly localCol: Signal<colDef> = computed(() => {
+    const col = this.col();
+    const result = colDefSchema.safeParse(col);
+    if (!result.success) {
+      throw new Error(`Invalid column definition: ${result.error.message}`);
+    }
+    return result.data;
+  });
   public readonly first: InputSignal<boolean> = input(false);
   public readonly isCollapsible: InputSignal<boolean> = input(false);
   public readonly isStripped: InputSignal<boolean> = input(false);
@@ -62,16 +90,16 @@ export class ListItemComponent implements AfterViewInit {
   }
 
   public selectItem(index: number): void {
-    this.rowIsClicked.emit({ index, col: this.col() });
+    this.rowIsClicked.emit({ index, col: this.localCol() });
   }
 
   public ngAfterViewInit(): void {
     const containerRef = this.container();
-    const template = this.col().template;
+    const template = this.localCol().template;
     if (template && containerRef) {
       const ref = containerRef.createComponent<BaseListItemComponent>(template);
       ref.instance.rowId = this.index();
-      ref.instance.col = this.col();
+      ref.instance.col = this.localCol();
     }
   }
 }
