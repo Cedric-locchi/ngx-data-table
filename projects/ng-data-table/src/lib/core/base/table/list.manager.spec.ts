@@ -140,37 +140,36 @@ describe('ListManager', () => {
       service.saveData(mockData);
     });
 
-    it('should return array of values for a given key', () => {
-      const names = service.getDataByKey('name');
+    it('should return value for a given key and rowId', () => {
+      const name = service.getDataByKey('name', 0);
 
-      expect(names).toEqual(['John', 'Jane', 'Bob']);
+      expect(name).toBe('John');
     });
 
-    it('should return array of values for different keys', () => {
-      const ids = service.getDataByKey('id');
-      const ages = service.getDataByKey('age');
+    it('should return values for different keys and rowIds', () => {
+      const id1 = service.getDataByKey('id', 0);
+      const age2 = service.getDataByKey('age', 1);
 
-      expect(ids).toEqual([1, 2, 3]);
-      expect(ages).toEqual([30, 25, 35]);
+      expect(id1).toBe(1);
+      expect(age2).toBe(25);
     });
 
     it('should handle null values in data', () => {
-      const emails = service.getDataByKey('email');
+      const email = service.getDataByKey('email', 2);
 
-      expect(emails).toEqual(['john@example.com', 'jane@example.com', null]);
+      expect(email).toBeNull();
     });
 
     it('should return undefined for non-existent keys', () => {
-      const result = service.getDataByKey('nonExistent');
+      const result = service.getDataByKey('nonExistent', 0);
 
-      expect(result).toEqual([undefined, undefined, undefined]);
+      expect(result).toBeUndefined();
     });
 
-    it('should return empty array when no data exists', () => {
-      service.saveData([]);
-      const result = service.getDataByKey('name');
+    it('should return undefined when rowId does not exist', () => {
+      const result = service.getDataByKey('name', 999);
 
-      expect(result).toEqual([]);
+      expect(result).toBeUndefined();
     });
 
     it('should handle nested object keys', () => {
@@ -179,16 +178,16 @@ describe('ListManager', () => {
         { id: 2, user: { name: 'Jane' } },
       ]);
 
-      const users = service.getDataByKey('user');
+      const user = service.getDataByKey('user', 0);
 
-      expect(users).toEqual([{ name: 'John' }, { name: 'Jane' }]);
+      expect(user).toEqual({ name: 'John' });
     });
 
     it('should return correct values after data update', () => {
       service.saveData([{ id: 1, name: 'Updated' }]);
-      const names = service.getDataByKey('name');
+      const name = service.getDataByKey('name', 0);
 
-      expect(names).toEqual(['Updated']);
+      expect(name).toBe('Updated');
     });
   });
 
@@ -203,8 +202,8 @@ describe('ListManager', () => {
       expect(service.store().rowState.isCollapsed).toBe(true);
 
       // Get data by key
-      const names = service.getDataByKey('name');
-      expect(names).toEqual(['Test']);
+      const name = service.getDataByKey('name', 0);
+      expect(name).toBe('Test');
 
       // Update data
       service.saveData([
@@ -249,7 +248,8 @@ describe('ListManager', () => {
       typedService.saveData(users);
 
       expect(typedService.store().data).toEqual(users);
-      expect(typedService.getDataByKey('email')).toEqual(['john@example.com', 'jane@example.com']);
+      expect(typedService.getDataByKey('email', 0)).toBe('john@example.com');
+      expect(typedService.getDataByKey('email', 1)).toBe('jane@example.com');
     });
   });
 });

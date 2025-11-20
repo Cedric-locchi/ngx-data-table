@@ -8,6 +8,8 @@ import {
   DataTableInputSearchComponent,
 } from '../../../ng-data-table/src/public-api';
 import { DateTime } from 'luxon';
+import { RatingCellComponent } from './components/rating-cell.component';
+import { TagsCellComponent } from './components/tags-cell.component';
 
 interface Game {
   [key: string]: string | number | string[];
@@ -31,11 +33,11 @@ interface Game {
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  public readonly title = 'Démo NgxDataTable';
+  public readonly title = 'NgxDataTable Demo';
   public readonly games = signal<Game[]>(gamesData);
   public readonly colDef = signal<colDef[]>([
     {
-      headerName: 'Titre',
+      headerName: 'Title',
       field: 'title',
       isVisible: true,
       isBold: true,
@@ -49,7 +51,7 @@ export class AppComponent {
       isEllipsis: true,
     },
     {
-      headerName: 'Date de création',
+      headerName: 'Creation Date',
       field: 'creationDate',
       isVisible: true,
       isDate: true,
@@ -59,21 +61,24 @@ export class AppComponent {
       headerName: 'Tags',
       field: 'tags',
       isVisible: true,
+      template: TagsCellComponent, // Custom component for tags
     },
     {
-      headerName: 'Note',
+      headerName: 'Rating',
       field: 'rating',
       isVisible: true,
       isSortable: true,
+      template: RatingCellComponent, // Custom component for rating
     },
   ]);
 
   public onRowClick(event: unknown) {
-    console.log('Ligne cliquée:', event);
+    console.log('Row clicked:', event);
   }
 
   public find(value: string) {
-    console.log(value);
+    console.log('Search term:', value);
+    // Implement search logic here
   }
 
   public sortDataSource(event: { field: string; direction: 'asc' | 'desc'; col: colDef }): void {

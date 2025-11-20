@@ -91,7 +91,7 @@ describe('ListItemComponent', () => {
     template: '<div class="mock-item">Mock Item</div>',
     standalone: true,
   })
-  class MockItemComponent extends BaseListItemComponent {}
+  class MockItemComponent extends BaseListItemComponent { }
 
   it('should create component from template and set instance properties', () => {
     const colWithTemplate: colDef = {
@@ -143,6 +143,6 @@ describe('ListItemComponent', () => {
 
     // Verify getDataFromKey calls ListManager
     mockItemInstance.getDataFromKey('name');
-    expect(mockListManager.getDataByKey).toHaveBeenCalledWith('name');
+    expect(mockListManager.getDataByKey).toHaveBeenCalledWith('name', 0);
   });
 });

@@ -39,9 +39,8 @@ export class ListManager<T extends Record<string, unknown> = Record<string, unkn
     }));
   }
 
-  public getDataByKey(key: string): unknown[] {
-    return this.store().data.map((row: T) => {
-      return row?.[key];
-    });
+  public getDataByKey(key: string, rowId: number): unknown {
+    const row = this.store().data[rowId];
+    return row?.[key];
   }
 }

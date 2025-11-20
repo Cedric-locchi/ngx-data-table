@@ -2,7 +2,7 @@
   <header>
     <h1>{{ title }}</h1>
     <p class="subtitle">
-      Démonstration du composant NgxDataTable avec une liste de jeux de société
+      Demonstration of NgxDataTable with custom cell components, sorting, and interactive features
     </p>
   </header>
 
@@ -17,7 +17,7 @@
         (sortDataSource)="sortDataSource($event)"
         [dataSources]="games()"
         [colDef]="colDef()"
-        [isStripped]="false"
+        [isStripped]="true"
         [displayBorder]="true"
         (rowIsClicked)="onRowClick($event)"
       />

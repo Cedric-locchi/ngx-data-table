@@ -34,6 +34,6 @@ export abstract class BaseListItemComponent {
   }
 
   public getDataFromKey(key: string): unknown {
-    return this.listManager.getDataByKey(key);
+    return this.listManager.getDataByKey(key, this.rowId);
   }
 }

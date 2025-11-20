@@ -8,11 +8,9 @@ import { colDef, colDefSchema, ListManager } from '../core';
 export class DataTableManagerService<T extends Record<string, unknown> = Record<string, unknown>> {
   private readonly listManager = inject(ListManager<T>);
 
-  // Computed signal qui lit depuis ListManager - source unique de vérité
   public readonly dataSources: Signal<T[]> = computed(() => this.listManager.store().data);
 
   public getDataFromCol(col: colDef): string[] {
-    // Validate column definition
     const result = colDefSchema.safeParse(col);
     if (!result.success) {
       console.error('Invalid column definition in getDataFromCol:', result.error);
@@ -33,6 +31,11 @@ export class DataTableManagerService<T extends Record<string, unknown> = Record<
 
     if (value === undefined || value === null) {
       return 'non renseigné';
+    }
+
+    // Arrays should be handled by custom templates, not converted to strings
+    if (Array.isArray(value)) {
+      return '';
     }
 
     if (col.isDate) {
