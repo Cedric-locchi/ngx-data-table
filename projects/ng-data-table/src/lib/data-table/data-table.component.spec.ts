@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DataTableComponent } from './data-table.component';
-import { colDef, dynamic, ListManager } from '../core';
+import { colDef, ListManager } from '../core';
 import { DataTableManagerService } from '../services';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -16,7 +16,7 @@ describe('DataTableComponent', () => {
     { headerName: 'Action', field: 'action', isVisible: true, isClickable: true },
   ];
 
-  const mockDataSources: dynamic[] = [
+  const mockDataSources: Record<string, unknown>[] = [
     { name: 'John Doe', email: 'john@example.com', hidden: 'secret', action: 'edit' },
     { name: 'Jane Smith', email: 'jane@example.com', hidden: 'secret2', action: 'delete' },
   ];
@@ -128,7 +128,7 @@ describe('DataTableComponent', () => {
 
   describe('data synchronization', () => {
     it('should synchronize data to ListManager via effect', () => {
-      const newData: dynamic[] = [{ id: 99, name: 'New Data' }];
+      const newData: Record<string, unknown>[] = [{ id: 99, name: 'New Data' }];
 
       fixture.componentRef.setInput('dataSources', newData);
       fixture.detectChanges();

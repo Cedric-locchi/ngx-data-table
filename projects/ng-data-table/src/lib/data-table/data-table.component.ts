@@ -24,7 +24,7 @@ import { DataTableManagerService } from '../services';
 import { ListItemComponent } from './ng-col/list-item/list-item.component';
 import { ListHeaderComponent } from './ng-col/list-header/list-header.component';
 import { nanoid } from 'nanoid';
-import { DataTableInputSearchComponent } from 'ng-data-table';
+import { DataTableInputSearchComponent } from './data-table-input-search/data-table-input-search.component';
 
 @Component({
   selector: 'ng-data-table',
