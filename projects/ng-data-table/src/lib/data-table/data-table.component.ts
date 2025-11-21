@@ -24,11 +24,12 @@ import { DataTableManagerService } from '../services';
 import { ListItemComponent } from './ng-col/list-item/list-item.component';
 import { ListHeaderComponent } from './ng-col/list-header/list-header.component';
 import { nanoid } from 'nanoid';
+import { DataTableInputSearchComponent } from 'ng-data-table';
 
 @Component({
   selector: 'ng-data-table',
   standalone: true,
-  imports: [ListItemComponent, ListHeaderComponent],
+  imports: [ListItemComponent, ListHeaderComponent, DataTableInputSearchComponent],
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -2,11 +2,6 @@ import { Component, signal } from '@angular/core';
 import { DataTableComponent } from '../../../ng-data-table/src/lib/data-table/data-table.component';
 import { colDef } from '../../../ng-data-table/src/lib/core/types/coldef';
 import gamesData from './ressources/data.json';
-import {
-  DataTableHeaderComponent,
-  DataTableFooterComponent,
-  DataTableInputSearchComponent,
-} from '../../../ng-data-table/src/public-api';
 import { DateTime } from 'luxon';
 import { RatingCellComponent } from './components/rating-cell.component';
 import { TagsCellComponent } from './components/tags-cell.component';
@@ -23,12 +18,7 @@ interface Game {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    DataTableComponent,
-    DataTableHeaderComponent,
-    DataTableFooterComponent,
-    DataTableInputSearchComponent,
-  ],
+  imports: [DataTableComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

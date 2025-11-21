@@ -1,4 +1,8 @@
 <div class="data-table__container">
+  <div class="data-table__container-header">
+    <ng-data-table-input-search />
+  </div>
+
   <div class="list" [class.border]="displayBorder()">
     <div class="body">
       @for (col of colDefVisible(); track col; let i = $index; let f = $first) {
