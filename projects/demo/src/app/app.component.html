@@ -8,16 +8,14 @@
 
   <main>
     <div class="table-container">
-
       <ng-data-table
         (sortDataSource)="sortDataSource($event)"
         [dataSources]="games()"
         [colDef]="colDef()"
-        [isStripped]="true"
+        [isStripped]="false"
         [displayBorder]="true"
         (rowIsClicked)="onRowClick($event)"
       />
-
     </div>
   </main>
 </div>

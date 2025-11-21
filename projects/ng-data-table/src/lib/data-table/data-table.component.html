@@ -1,6 +1,27 @@
 <div class="data-table__container">
   <div class="data-table__container-header">
     <ng-data-table-input-search />
+
+    <div class="action">
+      <button class="btn-icon" (click)="toggleColumnMenu()">
+        <fa-icon [size]="'1x'" [icon]="faColumns"></fa-icon>
+      </button>
+
+      @if (showColumnMenu()) {
+        <div class="menu">
+          @for (col of localColDef(); track col.field) {
+            <div class="menu-item" (click)="toggleColumnVisibility(col)">
+              <ng-toggle
+                [checked]="isColumnVisible(col)"
+                (click)="$event.stopPropagation()"
+                (checkedChange)="toggleColumnVisibility(col)"
+              />
+              <span>{{ col.headerName }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
 
   <div class="list" [class.border]="displayBorder()">

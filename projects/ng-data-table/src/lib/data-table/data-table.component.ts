@@ -8,7 +8,9 @@ import {
   InputSignal,
   output,
   OutputEmitterRef,
+  signal,
   Signal,
+  WritableSignal,
 } from '@angular/core';
 import {
   colDef,
@@ -25,11 +27,21 @@ import { ListItemComponent } from './ng-col/list-item/list-item.component';
 import { ListHeaderComponent } from './ng-col/list-header/list-header.component';
 import { nanoid } from 'nanoid';
 import { DataTableInputSearchComponent } from './data-table-input-search/data-table-input-search.component';
+import { FaIconComponent, IconDefinition } from '@fortawesome/angular-fontawesome';
+import { faColumns } from '@fortawesome/free-solid-svg-icons';
+
+import { ToggleComponent } from '../ui/toggle/toggle.component';
 
 @Component({
   selector: 'ng-data-table',
   standalone: true,
-  imports: [ListItemComponent, ListHeaderComponent, DataTableInputSearchComponent],
+  imports: [
+    ListItemComponent,
+    ListHeaderComponent,
+    DataTableInputSearchComponent,
+    FaIconComponent,
+    ToggleComponent,
+  ],
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,22 +59,28 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   public readonly dataTableManager: DataTableManagerService<T> = inject(DataTableManagerService<T>);
   public readonly listManager: ListManager<T> = inject(ListManager<T>);
 
+  public readonly faColumns: IconDefinition = faColumns;
+  public readonly showColumnMenu: WritableSignal<boolean> = signal(false);
+  public readonly overriddenVisibility: WritableSignal<Record<string, boolean>> = signal({});
+
   public readonly localColDef: Signal<colDef[]> = computed(() => {
     const cols = this.colDef();
-    // Validation des colonnes
     const result = z.array(colDefSchema).safeParse(cols);
     if (!result.success) {
-      console.error('Invalid column definitions:', result.error);
-      // On pourrait throw une erreur ici ou retourner un tableau vide/filtré
-      // Pour l'instant on log et on retourne les données telles quelles si possible ou on throw
       throw new Error(`Invalid column definitions: ${result.error.message}`);
     }
     return result.data as colDef[];
   });
 
-  public readonly colDefVisible: Signal<colDef[]> = computed(() =>
-    this.localColDef().filter((col: colDef) => col.isVisible),
-  );
+  public readonly colDefVisible: Signal<colDef[]> = computed(() => {
+    const overrides = this.overriddenVisibility();
+    return this.localColDef().filter((col: colDef) => {
+      if (overrides[col.field] !== undefined) {
+        return overrides[col.field];
+      }
+      return col.isVisible;
+    });
+  });
   public readonly sortDirection: Record<string, 'asc' | 'desc'> = {};
 
   constructor() {
@@ -100,5 +118,28 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
       this.rowIsClicked.emit(result.data as rowClicked<T>);
     }
+  }
+
+  public toggleColumnMenu(): void {
+    this.showColumnMenu.update((v) => !v);
+  }
+
+  public toggleColumnVisibility(col: colDef): void {
+    this.overriddenVisibility.update((v) => ({
+      ...v,
+      [col.field]: !this.isColumnVisible(col),
+    }));
+  }
+
+  public isColumnVisible(col: colDef): boolean {
+    const overrides = this.overriddenVisibility();
+    if (overrides[col.field] !== undefined) {
+      return overrides[col.field];
+    }
+    return !!col.isVisible;
+  }
+
+  public closeColumnMenu(): void {
+    this.showColumnMenu.set(false);
   }
 }

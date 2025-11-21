@@ -214,4 +214,59 @@ describe('DataTableComponent', () => {
       expect(component.sortDirection['name']).toBe('asc');
     });
   });
+
+  describe('column visibility menu', () => {
+    it('should toggle menu visibility', () => {
+      expect(component.showColumnMenu()).toBe(false);
+      component.toggleColumnMenu();
+      expect(component.showColumnMenu()).toBe(true);
+      component.toggleColumnMenu();
+      expect(component.showColumnMenu()).toBe(false);
+    });
+
+    it('should close menu', () => {
+      component.toggleColumnMenu();
+      expect(component.showColumnMenu()).toBe(true);
+      component.closeColumnMenu();
+      expect(component.showColumnMenu()).toBe(false);
+    });
+
+    it('should toggle column visibility', () => {
+      fixture.detectChanges();
+      const col = mockColDefs[0]; // Initially visible
+
+      expect(component.isColumnVisible(col)).toBe(true);
+
+      component.toggleColumnVisibility(col);
+      expect(component.isColumnVisible(col)).toBe(false);
+      expect(component.overriddenVisibility()[col.field]).toBe(false);
+
+      component.toggleColumnVisibility(col);
+      expect(component.isColumnVisible(col)).toBe(true);
+      expect(component.overriddenVisibility()[col.field]).toBe(true);
+    });
+
+    it('should update colDefVisible when visibility is toggled', () => {
+      fixture.detectChanges();
+      const initialVisibleCount = component.colDefVisible().length;
+      const col = mockColDefs[0];
+
+      component.toggleColumnVisibility(col);
+      fixture.detectChanges();
+
+      expect(component.colDefVisible().length).toBe(initialVisibleCount - 1);
+      expect(component.colDefVisible().find((c) => c.field === col.field)).toBeUndefined();
+    });
+
+    it('should show hidden column when toggled', () => {
+      fixture.detectChanges();
+      const hiddenCol = mockColDefs[2]; // Initially hidden
+
+      expect(component.isColumnVisible(hiddenCol)).toBe(false);
+
+      component.toggleColumnVisibility(hiddenCol);
+      expect(component.isColumnVisible(hiddenCol)).toBe(true);
+      expect(component.colDefVisible().find((c) => c.field === hiddenCol.field)).toBeDefined();
+    });
+  });
 });
