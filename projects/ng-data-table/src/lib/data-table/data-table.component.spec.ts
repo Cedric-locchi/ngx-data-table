@@ -1,15 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DataTableComponent } from './data-table.component';
+import { colDef, ListManager } from '../core';
 import { DataTableManagerService } from '../services';
-import { ListManager } from '../core';
-import { colDef, dynamic } from '../core';
-import { SimpleChange } from '@angular/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('DataTableComponent', () => {
   let component: DataTableComponent;
   let fixture: ComponentFixture<DataTableComponent>;
-  let dataTableManager: DataTableManagerService;
   let listManager: ListManager;
 
   const mockColDefs: colDef[] = [
@@ -19,7 +16,7 @@ describe('DataTableComponent', () => {
     { headerName: 'Action', field: 'action', isVisible: true, isClickable: true },
   ];
 
-  const mockDataSources: dynamic[] = [
+  const mockDataSources: Record<string, unknown>[] = [
     { name: 'John Doe', email: 'john@example.com', hidden: 'secret', action: 'edit' },
     { name: 'Jane Smith', email: 'jane@example.com', hidden: 'secret2', action: 'delete' },
   ];
@@ -32,7 +29,6 @@ describe('DataTableComponent', () => {
 
     fixture = TestBed.createComponent(DataTableComponent);
     component = fixture.componentInstance;
-    dataTableManager = TestBed.inject(DataTableManagerService);
     listManager = TestBed.inject(ListManager);
 
     fixture.componentRef.setInput('dataSources', mockDataSources);
@@ -76,7 +72,7 @@ describe('DataTableComponent', () => {
   describe('colDefVisible', () => {
     it('should return only visible columns', () => {
       fixture.detectChanges();
-      const visibleCols = component.colDefVisible;
+      const visibleCols = component.colDefVisible();
       expect(visibleCols).toHaveLength(3);
       expect(visibleCols.every((col) => col.isVisible)).toBe(true);
       expect(visibleCols.find((col) => col.field === 'hidden')).toBeUndefined();
@@ -130,35 +126,26 @@ describe('DataTableComponent', () => {
     });
   });
 
-  describe('ngOnChanges', () => {
-    it('should save data to listManager when dataSources change', () => {
-      const saveDataSpy = vi.spyOn(listManager, 'saveData');
+  describe('data synchronization', () => {
+    it('should synchronize data to ListManager via effect', () => {
+      const newData: Record<string, unknown>[] = [{ id: 99, name: 'New Data' }];
 
-      component.ngOnChanges({
-        dataSources: new SimpleChange(null, mockDataSources, true),
-      });
+      fixture.componentRef.setInput('dataSources', newData);
+      fixture.detectChanges();
 
-      expect(saveDataSpy).toHaveBeenCalledWith(mockDataSources);
-    });
-
-    it('should update dataTableManager.dataSources when dataSources change', () => {
-      component.ngOnChanges({
-        dataSources: new SimpleChange(null, mockDataSources, true),
-      });
-
-      expect(dataTableManager.dataSources).toEqual(mockDataSources);
+      expect(listManager.store().data).toEqual(newData);
     });
   });
 
   describe('clicked', () => {
     it('should emit rowIsClicked with correct data when clickable column exists', () => {
       fixture.detectChanges();
-      dataTableManager.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
 
       const spy = vi.fn();
       component.rowIsClicked.subscribe(spy);
 
-      component.clicked(0);
+      component.clicked({ index: 0, col: mockColDefs[3] }); // Use the clickable column
 
       expect(spy).toHaveBeenCalledWith({
         col: mockColDefs[3], // The clickable column
@@ -167,35 +154,35 @@ describe('DataTableComponent', () => {
       });
     });
 
-    it('should not emit rowIsClicked when no clickable column exists', () => {
-      const colDefsWithoutClickable: colDef[] = [
+    it('should not emit rowIsClicked when column is not clickable', () => {
+      const mockColDefs: colDef[] = [
         { headerName: 'Name', field: 'name', isVisible: true },
         { headerName: 'Email', field: 'email', isVisible: true },
       ];
 
-      fixture.componentRef.setInput('colDef', colDefsWithoutClickable);
+      fixture.componentRef.setInput('colDef', mockColDefs);
       fixture.detectChanges();
-      dataTableManager.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
 
       const spy = vi.fn();
       component.rowIsClicked.subscribe(spy);
 
-      component.clicked(0);
+      component.clicked({ index: 0, col: mockColDefs[0] });
 
       expect(spy).not.toHaveBeenCalled();
     });
 
     it('should emit with correct index for different rows', () => {
       fixture.detectChanges();
-      dataTableManager.dataSources = mockDataSources;
+      listManager.saveData(mockDataSources);
 
       const spy = vi.fn();
       component.rowIsClicked.subscribe(spy);
 
-      component.clicked(1);
+      component.clicked({ index: 1, col: mockColDefs[3] }); // Use the clickable column
 
       expect(spy).toHaveBeenCalledWith({
-        col: mockColDefs[3],
+        col: mockColDefs[3], // The clickable column
         index: 1,
         row: mockDataSources[1],
       });
@@ -210,7 +197,7 @@ describe('DataTableComponent', () => {
 
       expect(component.isStripped()).toBe(true);
       expect(component.displayBorder()).toBe(true);
-      expect(component.colDefVisible).toHaveLength(3);
+      expect(component.colDefVisible()).toHaveLength(3);
     });
 
     it('should maintain sort direction across multiple sorts', () => {
@@ -225,6 +212,164 @@ describe('DataTableComponent', () => {
 
       component.sortByColumn(col); // asc again
       expect(component.sortDirection['name']).toBe('asc');
+    });
+  });
+
+  describe('column visibility menu', () => {
+    it('should toggle menu visibility', () => {
+      expect(component.showColumnMenu()).toBe(false);
+      component.toggleColumnMenu();
+      expect(component.showColumnMenu()).toBe(true);
+      component.toggleColumnMenu();
+      expect(component.showColumnMenu()).toBe(false);
+    });
+
+    it('should close menu', () => {
+      component.toggleColumnMenu();
+      expect(component.showColumnMenu()).toBe(true);
+      component.closeColumnMenu();
+      expect(component.showColumnMenu()).toBe(false);
+    });
+
+    it('should toggle column visibility', () => {
+      fixture.detectChanges();
+      const col = mockColDefs[0]; // Initially visible
+
+      expect(component.isColumnVisible(col)).toBe(true);
+
+      component.toggleColumnVisibility(col);
+      expect(component.isColumnVisible(col)).toBe(false);
+      expect(component.overriddenVisibility()[col.field]).toBe(false);
+
+      component.toggleColumnVisibility(col);
+      expect(component.isColumnVisible(col)).toBe(true);
+      expect(component.overriddenVisibility()[col.field]).toBe(true);
+    });
+
+    it('should update colDefVisible when visibility is toggled', () => {
+      fixture.detectChanges();
+      const initialVisibleCount = component.colDefVisible().length;
+      const col = mockColDefs[0];
+
+      component.toggleColumnVisibility(col);
+      fixture.detectChanges();
+
+      expect(component.colDefVisible().length).toBe(initialVisibleCount - 1);
+      expect(component.colDefVisible().find((c) => c.field === col.field)).toBeUndefined();
+    });
+
+    it('should show hidden column when toggled', () => {
+      fixture.detectChanges();
+      const hiddenCol = mockColDefs[2]; // Initially hidden
+
+      expect(component.isColumnVisible(hiddenCol)).toBe(false);
+
+      component.toggleColumnVisibility(hiddenCol);
+      expect(component.isColumnVisible(hiddenCol)).toBe(true);
+      expect(component.colDefVisible().find((c) => c.field === hiddenCol.field)).toBeDefined();
+    });
+  });
+
+  describe('Drag and Drop', () => {
+    it('should reorder columns on drop', () => {
+      fixture.componentRef.setInput('colDef', [
+        { field: 'col1', headerName: 'Col 1' },
+        { field: 'col2', headerName: 'Col 2' },
+        { field: 'col3', headerName: 'Col 3' },
+      ]);
+
+      const dragEvent = {
+        preventDefault: vi.fn(),
+        dataTransfer: {
+          getData: vi.fn().mockReturnValue('col1'),
+        },
+      } as unknown as DragEvent;
+
+      const targetCol = { field: 'col3', headerName: 'Col 3' } as colDef;
+
+      component.onDrop(dragEvent, targetCol);
+
+      expect(component.columnOrder()).toEqual(['col2', 'col3', 'col1']);
+      expect(component.allColDefOrdered().map((c) => c.field)).toEqual(['col2', 'col3', 'col1']);
+    });
+
+    it('should not reorder if dropped on same column', () => {
+      fixture.componentRef.setInput('colDef', [
+        { field: 'col1', headerName: 'Col 1' },
+        { field: 'col2', headerName: 'Col 2' },
+      ]);
+
+      const dragEvent = {
+        preventDefault: vi.fn(),
+        dataTransfer: {
+          getData: vi.fn().mockReturnValue('col1'),
+        },
+      } as unknown as DragEvent;
+
+      const targetCol = { field: 'col1', headerName: 'Col 1' } as colDef;
+
+      component.onDrop(dragEvent, targetCol);
+
+      expect(component.columnOrder()).toEqual([]);
+    });
+
+    it('should set drag data on drag start', () => {
+      const dragEvent = {
+        dataTransfer: {
+          setData: vi.fn(),
+          effectAllowed: '',
+        },
+      } as unknown as DragEvent;
+
+      const col = { field: 'col1', headerName: 'Col 1' } as colDef;
+
+      component.onDragStart(dragEvent, col);
+
+      expect(dragEvent.dataTransfer?.setData).toHaveBeenCalledWith('text/plain', 'col1');
+      expect(dragEvent.dataTransfer?.effectAllowed).toBe('move');
+    });
+    describe('Column State', () => {
+      it('should emit columnStateChange when visibility changes', () => {
+        const spy = vi.fn();
+        component.columnStateChange.subscribe(spy);
+        fixture.detectChanges();
+
+        const col = mockColDefs[0];
+        component.toggleColumnVisibility(col);
+        fixture.detectChanges();
+
+        expect(spy).toHaveBeenCalled();
+        const lastEmit = spy.mock.calls[spy.mock.calls.length - 1][0] as colDef[];
+        expect(lastEmit.find((c) => c.field === col.field)?.isVisible).toBe(false);
+      });
+
+      it('should emit columnStateChange when order changes', () => {
+        const spy = vi.fn();
+        component.columnStateChange.subscribe(spy);
+        fixture.detectChanges();
+
+        fixture.componentRef.setInput('colDef', [
+          { field: 'col1', headerName: 'Col 1' },
+          { field: 'col2', headerName: 'Col 2' },
+        ]);
+        fixture.detectChanges();
+
+        const dragEvent = {
+          preventDefault: vi.fn(),
+          dataTransfer: {
+            getData: vi.fn().mockReturnValue('col1'),
+          },
+        } as unknown as DragEvent;
+
+        const targetCol = { field: 'col2', headerName: 'Col 2' } as colDef;
+
+        component.onDrop(dragEvent, targetCol);
+        fixture.detectChanges();
+
+        expect(spy).toHaveBeenCalled();
+        const lastEmit = spy.mock.calls[spy.mock.calls.length - 1][0] as colDef[];
+        expect(lastEmit.map((c) => c.field)).toEqual(['col2', 'col1']);
+      });
     });
   });
 });

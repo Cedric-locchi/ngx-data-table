@@ -1,0 +1,22 @@
+{
+  "debug.javascript.terminalOptions": {
+    "skipFiles": ["<node_internals>/**", "**/node_modules/**", "**/$KNOWN_TOOLS$/**"]
+  },
+  "jestrunner.debugOptions": {
+    "skipFiles": ["<node_internals>/**", "**/node_modules/**", "**/$KNOWN_TOOLS$/**"]
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.rulers": [150, 180],
+  "eslint.enable": true,
+  "prettier.enable": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "stylelint.configBasedir": "node_modules",
+  "stylelint.configFile": ".stylelintrc.json",
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.validate": ["css", "postcss", "scss"]
+}

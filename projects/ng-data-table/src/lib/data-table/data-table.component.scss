@@ -13,47 +13,77 @@
 
 :host {
   font-family: 'Roboto', sans-serif;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .data-table__container {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  height: auto;
+  flex: 1;
+  min-height: 0;
 
   &.border {
-    border: 1px solid #DFE9F1;
+    border: 1px solid #dfe9f1;
     border-radius: 8px;
     padding: 0;
-    box-shadow: 0 1px 5.3px 0 #EEF3F7;
+    box-shadow: 0 1px 5.3px 0 #eef3f7;
+  }
+
+  .header-row {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
+    background: white;
+    border-bottom: 2px solid #dfe9f1;
   }
 
   .body {
-    min-height: 100%;
-    height: auto;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(20px, auto));
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     border-radius: 8px;
 
     .col {
       display: flex;
       flex-direction: column;
+
+      ng-list-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white;
+      }
     }
-
   }
-
 }
 
 .hovered {
-  background-color: #F8FAFC;
+  background-color: #f8fafc;
 }
 
 .odd {
-  background-color: #F8FAFC;
+  background-color: #f8fafc;
 }
 
 .bold {
@@ -61,7 +91,7 @@
 }
 
 .shadow {
-  box-shadow: 0 1px 8px 0 #E6EEF4;
+  box-shadow: 0 1px 8px 0 #e6eef4;
 }
 
 .no-data {
@@ -71,6 +101,101 @@
   height: 100%;
   width: 100%;
   font-size: 16px;
-  color: #688EAD;
+  color: #688ead;
 }
 
+.btn-icon {
+  height: 40px;
+  width: 40px;
+  border: 1px solid #dfe9f1;
+  background-color: white;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #f8fafc;
+  }
+}
+
+.action {
+  position: relative;
+
+  .menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    background: white;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 100;
+    min-width: 240px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    animation: menu-fade-in 0.2s ease-out forwards;
+    transform-origin: top right;
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      user-select: none;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      &.drag-over {
+        border-top: 2px solid #007bff;
+      }
+
+      .drag-handle {
+        margin-right: 8px;
+        color: #aaa;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+          color: #666;
+        }
+
+        &:active {
+          cursor: grabbing;
+        }
+      }
+
+      .column-label {
+        flex: 1;
+        font-size: 14px;
+        color: #333;
+      }
+
+      ng-toggle {
+        margin-left: 12px;
+      }
+    }
+  }
+}
+
+@keyframes menu-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

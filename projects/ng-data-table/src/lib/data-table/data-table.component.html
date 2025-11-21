@@ -1,32 +1,58 @@
 <div class="data-table__container">
+  <div class="data-table__container-header">
+    <ng-data-table-input-search />
+
+    <div class="action">
+      <button class="btn-icon" (click)="toggleColumnMenu()">
+        <fa-icon [size]="'1x'" [icon]="faColumns"></fa-icon>
+      </button>
+
+      @if (showColumnMenu()) {
+        <div class="menu">
+          @for (col of allColDefOrdered(); track col.field) {
+            <div
+              class="dropdown-item"
+              draggable="true"
+              (dragstart)="onDragStart($event, col)"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop($event, col)"
+            >
+              <div class="drag-handle">
+                <fa-icon [icon]="faGripVertical"></fa-icon>
+              </div>
+              <span class="column-label">{{ col.headerName }}</span>
+              <ng-toggle
+                [checked]="isColumnVisible(col)"
+                (checkedChange)="toggleColumnVisibility(col, $event)"
+              />
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
 
   <div class="list" [class.border]="displayBorder()">
     <div class="body">
-      @for (col of colDefVisible; track col; let i = $index; let f = $first) {
-      <div class="col">
-        @for (item of dataTableManager.getDataFromCol(col); track $index) {
+      @for (col of colDefVisible(); track col; let i = $index; let f = $first) {
+        <div class="col">
+          @for (item of dataTableManager.getDataFromCol(col); track $index) {
+            <ng-list-header [f]="$first" [col]="col" (isSortable)="sortByColumn($event)" />
 
-        <ng-list-header
-          [f]="$first"
-          [col]="col"
-          (isSortable)="sortByColumn($event)"
-        />
-
-        <ng-list-item
-          (rowIsClicked)="clicked($event)"
-          [componentId]="componentId"
-          [dataSource]="dataSources()"
-          [first]="f"
-          [index]="$index"
-          [isStripped]="isStripped()"
-          [item]="item"
-          [odd]="$odd"
-          [col]="col"
-        />
-        }
-      </div>
+            <ng-list-item
+              (rowIsClicked)="clicked($event)"
+              [componentId]="componentId"
+              [dataSource]="dataSources()"
+              [first]="f"
+              [index]="$index"
+              [isStripped]="isStripped()"
+              [item]="item"
+              [odd]="$odd"
+              [col]="col"
+            />
+          }
+        </div>
       }
     </div>
-
   </div>
 </div>

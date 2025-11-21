@@ -2,27 +2,21 @@
   <header>
     <h1>{{ title }}</h1>
     <p class="subtitle">
-      Démonstration du composant NgxDataTable avec une liste de jeux de société
+      Demonstration of NgxDataTable with custom cell components, sorting, and interactive features
     </p>
   </header>
 
   <main>
     <div class="table-container">
-      <div class="row-table-header">
-        <ng-data-table-header header [size]="games().length" />
-        <ng-data-table-input-search (searchTerm)="find($event)" />
-      </div>
-
       <ng-data-table
         (sortDataSource)="sortDataSource($event)"
         [dataSources]="games()"
         [colDef]="colDef()"
-        [isStripped]="true"
+        [isStripped]="false"
         [displayBorder]="true"
         (rowIsClicked)="onRowClick($event)"
+        (columnStateChange)="onColumnStateChange($event)"
       />
-
-      <ng-data-table-footer [size]="games().length" />
     </div>
   </main>
 </div>
