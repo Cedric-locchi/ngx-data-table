@@ -9,14 +9,22 @@
 
       @if (showColumnMenu()) {
         <div class="menu">
-          @for (col of localColDef(); track col.field) {
-            <div class="menu-item" (click)="toggleColumnVisibility(col)">
+          @for (col of allColDefOrdered(); track col.field) {
+            <div
+              class="dropdown-item"
+              draggable="true"
+              (dragstart)="onDragStart($event, col)"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop($event, col)"
+            >
+              <div class="drag-handle">
+                <fa-icon [icon]="faGripVertical"></fa-icon>
+              </div>
+              <span class="column-label">{{ col.headerName }}</span>
               <ng-toggle
                 [checked]="isColumnVisible(col)"
-                (click)="$event.stopPropagation()"
-                (checkedChange)="toggleColumnVisibility(col)"
+                (checkedChange)="toggleColumnVisibility(col, $event)"
               />
-              <span>{{ col.headerName }}</span>
             </div>
           }
         </div>

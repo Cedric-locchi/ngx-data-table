@@ -97,6 +97,35 @@ interface colDef {
   isSortable?: boolean; // Enable column sorting (default: false)
   template?: Type<BaseListItemComponent>; // Custom cell component
 }
+  isSortable?: boolean; // Enable column sorting (default: false)
+  template?: Type<BaseListItemComponent>; // Custom cell component
+}
+```
+
+### Column Management
+
+The table includes a built-in column management menu that allows users to:
+
+- **Toggle Visibility**: Show or hide columns using the toggle switches.
+- **Reorder Columns**: Drag and drop columns using the grip icon to change their order.
+
+### Column State
+
+You can listen to changes in column configuration (visibility and order) using the `columnStateChange` output. This is useful for persisting user preferences.
+
+```html
+<ng-data-table
+  [dataSources]="data"
+  [colDef]="columns"
+  (columnStateChange)="onColumnStateChange($event)"
+/>
+```
+
+```typescript
+onColumnStateChange(columns: colDef[]) {
+  console.log('New column state:', columns);
+  // Save to local storage or backend
+}
 ```
 
 ## 💡 Examples

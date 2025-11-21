@@ -28,7 +28,7 @@ import { ListHeaderComponent } from './ng-col/list-header/list-header.component'
 import { nanoid } from 'nanoid';
 import { DataTableInputSearchComponent } from './data-table-input-search/data-table-input-search.component';
 import { FaIconComponent, IconDefinition } from '@fortawesome/angular-fontawesome';
-import { faColumns } from '@fortawesome/free-solid-svg-icons';
+import { faColumns, faGripVertical } from '@fortawesome/free-solid-svg-icons';
 
 import { ToggleComponent } from '../ui/toggle/toggle.component';
 
@@ -60,8 +60,11 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   public readonly listManager: ListManager<T> = inject(ListManager<T>);
 
   public readonly faColumns: IconDefinition = faColumns;
+  public readonly faGripVertical: IconDefinition = faGripVertical;
   public readonly showColumnMenu: WritableSignal<boolean> = signal(false);
   public readonly overriddenVisibility: WritableSignal<Record<string, boolean>> = signal({});
+  public readonly columnOrder: WritableSignal<string[]> = signal([]);
+  public readonly columnStateChange: OutputEmitterRef<colDef[]> = output<colDef[]>();
 
   public readonly localColDef: Signal<colDef[]> = computed(() => {
     const cols = this.colDef();
@@ -72,20 +75,54 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     return result.data as colDef[];
   });
 
+  public readonly allColDefOrdered: Signal<colDef[]> = computed(() => {
+    const order = this.columnOrder();
+    const cols = this.localColDef();
+
+    // Sort columns based on order
+    return [...cols].sort((a, b) => {
+      const indexA = order.indexOf(a.field);
+      const indexB = order.indexOf(b.field);
+
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+      if (indexA !== -1) {
+        return -1;
+      }
+      if (indexB !== -1) {
+        return 1;
+      }
+      return 0;
+    });
+  });
+
   public readonly colDefVisible: Signal<colDef[]> = computed(() => {
     const overrides = this.overriddenVisibility();
-    return this.localColDef().filter((col: colDef) => {
+    return this.allColDefOrdered().filter((col: colDef) => {
       if (overrides[col.field] !== undefined) {
         return overrides[col.field];
       }
       return col.isVisible;
     });
   });
+
+  public readonly columnState: Signal<colDef[]> = computed(() => {
+    const overrides = this.overriddenVisibility();
+    return this.allColDefOrdered().map((col) => ({
+      ...col,
+      isVisible: overrides[col.field] !== undefined ? overrides[col.field] : col.isVisible,
+    }));
+  });
   public readonly sortDirection: Record<string, 'asc' | 'desc'> = {};
 
   constructor() {
     effect(() => {
       this.listManager.saveData(this.dataSources());
+    });
+
+    effect(() => {
+      this.columnStateChange.emit(this.columnState());
     });
   }
 
@@ -124,11 +161,12 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     this.showColumnMenu.update((v) => !v);
   }
 
-  public toggleColumnVisibility(col: colDef): void {
-    this.overriddenVisibility.update((v) => ({
-      ...v,
-      [col.field]: !this.isColumnVisible(col),
-    }));
+  public toggleColumnVisibility(col: colDef, isVisible?: boolean): void {
+    this.overriddenVisibility.update((v) => {
+      const current = v[col.field] !== undefined ? v[col.field] : col.isVisible;
+      const newState = isVisible !== undefined ? isVisible : !current;
+      return { ...v, [col.field]: newState };
+    });
   }
 
   public isColumnVisible(col: colDef): boolean {
@@ -141,5 +179,39 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   public closeColumnMenu(): void {
     this.showColumnMenu.set(false);
+  }
+
+  public onDragStart(event: DragEvent, col: colDef): void {
+    if (event.dataTransfer) {
+      event.dataTransfer.setData('text/plain', col.field);
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  public onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  public onDrop(event: DragEvent, targetCol: colDef): void {
+    event.preventDefault();
+    const draggedField = event.dataTransfer?.getData('text/plain');
+    if (draggedField && draggedField !== targetCol.field) {
+      const currentOrder =
+        this.columnOrder().length > 0
+          ? [...this.columnOrder()]
+          : this.localColDef().map((c) => c.field);
+
+      const fromIndex = currentOrder.indexOf(draggedField);
+      const toIndex = currentOrder.indexOf(targetCol.field);
+
+      if (fromIndex !== -1 && toIndex !== -1) {
+        currentOrder.splice(fromIndex, 1);
+        currentOrder.splice(toIndex, 0, draggedField);
+        this.columnOrder.set(currentOrder);
+      }
+    }
   }
 }

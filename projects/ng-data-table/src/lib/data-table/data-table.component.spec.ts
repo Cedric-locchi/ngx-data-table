@@ -269,4 +269,107 @@ describe('DataTableComponent', () => {
       expect(component.colDefVisible().find((c) => c.field === hiddenCol.field)).toBeDefined();
     });
   });
+
+  describe('Drag and Drop', () => {
+    it('should reorder columns on drop', () => {
+      fixture.componentRef.setInput('colDef', [
+        { field: 'col1', headerName: 'Col 1' },
+        { field: 'col2', headerName: 'Col 2' },
+        { field: 'col3', headerName: 'Col 3' },
+      ]);
+
+      const dragEvent = {
+        preventDefault: vi.fn(),
+        dataTransfer: {
+          getData: vi.fn().mockReturnValue('col1'),
+        },
+      } as unknown as DragEvent;
+
+      const targetCol = { field: 'col3', headerName: 'Col 3' } as colDef;
+
+      component.onDrop(dragEvent, targetCol);
+
+      expect(component.columnOrder()).toEqual(['col2', 'col3', 'col1']);
+      expect(component.allColDefOrdered().map((c) => c.field)).toEqual(['col2', 'col3', 'col1']);
+    });
+
+    it('should not reorder if dropped on same column', () => {
+      fixture.componentRef.setInput('colDef', [
+        { field: 'col1', headerName: 'Col 1' },
+        { field: 'col2', headerName: 'Col 2' },
+      ]);
+
+      const dragEvent = {
+        preventDefault: vi.fn(),
+        dataTransfer: {
+          getData: vi.fn().mockReturnValue('col1'),
+        },
+      } as unknown as DragEvent;
+
+      const targetCol = { field: 'col1', headerName: 'Col 1' } as colDef;
+
+      component.onDrop(dragEvent, targetCol);
+
+      expect(component.columnOrder()).toEqual([]);
+    });
+
+    it('should set drag data on drag start', () => {
+      const dragEvent = {
+        dataTransfer: {
+          setData: vi.fn(),
+          effectAllowed: '',
+        },
+      } as unknown as DragEvent;
+
+      const col = { field: 'col1', headerName: 'Col 1' } as colDef;
+
+      component.onDragStart(dragEvent, col);
+
+      expect(dragEvent.dataTransfer?.setData).toHaveBeenCalledWith('text/plain', 'col1');
+      expect(dragEvent.dataTransfer?.effectAllowed).toBe('move');
+    });
+    describe('Column State', () => {
+      it('should emit columnStateChange when visibility changes', () => {
+        const spy = vi.fn();
+        component.columnStateChange.subscribe(spy);
+        fixture.detectChanges();
+
+        const col = mockColDefs[0];
+        component.toggleColumnVisibility(col);
+        fixture.detectChanges();
+
+        expect(spy).toHaveBeenCalled();
+        const lastEmit = spy.mock.calls[spy.mock.calls.length - 1][0] as colDef[];
+        expect(lastEmit.find((c) => c.field === col.field)?.isVisible).toBe(false);
+      });
+
+      it('should emit columnStateChange when order changes', () => {
+        const spy = vi.fn();
+        component.columnStateChange.subscribe(spy);
+        fixture.detectChanges();
+
+        fixture.componentRef.setInput('colDef', [
+          { field: 'col1', headerName: 'Col 1' },
+          { field: 'col2', headerName: 'Col 2' },
+        ]);
+        fixture.detectChanges();
+
+        const dragEvent = {
+          preventDefault: vi.fn(),
+          dataTransfer: {
+            getData: vi.fn().mockReturnValue('col1'),
+          },
+        } as unknown as DragEvent;
+
+        const targetCol = { field: 'col2', headerName: 'Col 2' } as colDef;
+
+        component.onDrop(dragEvent, targetCol);
+        fixture.detectChanges();
+
+        expect(spy).toHaveBeenCalled();
+        const lastEmit = spy.mock.calls[spy.mock.calls.length - 1][0] as colDef[];
+        expect(lastEmit.map((c) => c.field)).toEqual(['col2', 'col1']);
+      });
+    });
+  });
 });

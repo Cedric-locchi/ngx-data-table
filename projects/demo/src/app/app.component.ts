@@ -109,4 +109,8 @@ export class AppComponent {
     if (valueA > valueB) return 1;
     return 0;
   }
+
+  public onColumnStateChange(columns: colDef[]): void {
+    console.log('Column state changed:', columns);
+  }
 }
