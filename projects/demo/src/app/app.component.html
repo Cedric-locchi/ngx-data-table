@@ -1,6 +1,7 @@
 <div class="demo-container">
   <header>
     <h1>{{ title }}</h1>
+    <button (click)="toggleTheme()">Toggle Theme</button>
     <p class="subtitle">
       Demonstration of NgxDataTable with custom cell components, sorting, and interactive features
     </p>
@@ -10,12 +11,17 @@
     <div class="table-container">
       <ng-data-table
         (sortDataSource)="sortDataSource($event)"
-        [dataSources]="games()"
+        [dataSources]="paginatedGames()"
         [colDef]="colDef()"
         [isStripped]="false"
         [displayBorder]="true"
         (rowIsClicked)="onRowClick($event)"
         (columnStateChange)="onColumnStateChange($event)"
+        [totalItems]="allGames().length"
+        [pageSize]="pageSize()"
+        [currentPage]="currentPage()"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
       />
     </div>
   </main>

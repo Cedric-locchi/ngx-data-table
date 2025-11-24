@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, computed } from '@angular/core';
 import { DataTableComponent } from '../../../ng-data-table/src/lib/data-table/data-table.component';
 import { colDef } from '../../../ng-data-table/src/lib/core/types/coldef';
 import gamesData from './ressources/data.json';
@@ -22,9 +22,18 @@ interface Game {
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   public readonly title = 'NgxDataTable Demo';
-  public readonly games = signal<Game[]>(gamesData);
+  public readonly allGames = signal<Game[]>(gamesData);
+  public readonly currentPage = signal(1);
+  public readonly pageSize = signal(10);
+
+  public readonly paginatedGames = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    const end = start + this.pageSize();
+    return this.allGames().slice(start, end);
+  });
+
   public readonly colDef = signal<colDef[]>([
     {
       headerName: 'Title',
@@ -72,12 +81,12 @@ export class AppComponent {
   }
 
   public sortDataSource(event: { field: string; direction: 'asc' | 'desc'; col: colDef }): void {
-    const sortedGames = [...this.games()].sort((a: Game, b: Game) => {
+    const sortedGames = [...this.allGames()].sort((a: Game, b: Game) => {
       const comparison = this.compareValues(a[event.field], b[event.field], event.col.isDate);
       return event.direction === 'asc' ? comparison : -comparison;
     });
 
-    this.games.set(sortedGames);
+    this.allGames.set(sortedGames);
   }
 
   private compareValues(
@@ -112,5 +121,34 @@ export class AppComponent {
 
   public onColumnStateChange(columns: colDef[]): void {
     console.log('Column state changed:', columns);
+  }
+
+  public ngOnInit(): void {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (!currentTheme) {
+      document.documentElement.setAttribute('data-theme', 'modern');
+    }
+  }
+
+  public toggleTheme(): void {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    let newTheme = 'material';
+
+    if (currentTheme === 'material') {
+      newTheme = 'modern';
+    } else {
+      newTheme = 'material';
+    }
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+  }
+
+  public onPageChange(page: number): void {
+    this.currentPage.set(page);
+  }
+
+  public onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1); // Reset to first page when size changes
   }
 }

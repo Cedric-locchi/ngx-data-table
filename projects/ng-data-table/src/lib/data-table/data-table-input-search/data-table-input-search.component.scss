@@ -1,14 +1,166 @@
-.data-table-input-search {
+.md3-text-field {
+  display: inline-block;
+  position: relative;
   width: 400px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  box-sizing: border-box;
+  font-family: var(--dt-font-family, Roboto, sans-serif);
+  line-height: 1.5;
 
-  &:focus {
-    border-color: #66afe9;
+  .container {
+    position: relative;
+    width: 100%;
+    height: 56px; // Standard M3 height
+    display: flex;
+    align-items: center;
+    border-radius: var(--dt-input-radius, 4px) var(--dt-input-radius, 4px) 0 0;
+    box-sizing: border-box;
+  }
+
+  .data-table-input-search {
+    width: 100%;
+    height: 100%;
+    padding: 24px 16px 8px; // Top padding for label space
+    font-size: 1rem;
+    line-height: 24px;
+    background: transparent;
+    border: none;
     outline: none;
-    box-shadow: 0 0 5px rgba(102, 175, 233, 0.6);
+    color: var(--dt-input-text-color);
+    caret-color: var(--dt-input-focus-border);
+    box-sizing: border-box;
+    z-index: 1;
+
+    // Hide native placeholder when label is present and not floating
+    &:not(:placeholder-shown) + label,
+    &:focus + label {
+      transform: translateY(-50%) scale(0.75);
+      top: 16px; // Position when floating
+      color: var(--dt-input-focus-border);
+    }
+  }
+
+  label {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--dt-input-text-color);
+    pointer-events: none;
+    transition:
+      transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      top 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      color 0.2s;
+    transform-origin: left top;
+    opacity: 0.7;
+    z-index: 2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 32px);
+  }
+
+  // FILLED VARIANT
+  &.filled {
+    .container {
+      background-color: var(--dt-input-bg);
+      border-bottom: 1px solid var(--dt-input-text-color); // Inactive state
+    }
+
+    .active-indicator {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--dt-input-focus-border);
+      transform: scaleX(0);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+    }
+
+    .data-table-input-search:focus ~ .active-indicator {
+      transform: scaleX(1);
+    }
+
+    .data-table-input-search:hover ~ .container {
+      background-color: color-mix(in srgb, var(--dt-input-bg), black 8%);
+    }
+  }
+
+  // OUTLINED VARIANT
+  &.outlined {
+    .container {
+      border-radius: var(--dt-input-radius, 4px);
+      height: 56px;
+    }
+
+    .data-table-input-search {
+      padding: 16px;
+    }
+
+    label {
+      left: 14px;
+    }
+
+    .outline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+      padding: 0 10px;
+      pointer-events: none;
+      border: 1px solid var(--dt-input-border);
+      border-radius: inherit;
+      z-index: 0;
+      transition: border-color 0.2s;
+
+      legend {
+        display: block;
+        width: auto;
+        max-width: 0.01px; // Initially collapsed
+        height: 11px;
+        font-size: 0.75em;
+        visibility: hidden;
+        transition: max-width 0.05s cubic-bezier(0.4, 0, 0.2, 1);
+
+        span {
+          padding: 0 4px;
+        }
+      }
+    }
+
+    .data-table-input-search:focus ~ .outline,
+    .data-table-input-search:not(:placeholder-shown) ~ .outline {
+      border-color: var(--dt-input-focus-border);
+
+      legend {
+        max-width: 100%; // Expand to fit label
+      }
+    }
+
+    .data-table-input-search:focus ~ .outline {
+      border-width: 2px;
+
+      legend {
+        color: var(--dt-input-focus-border);
+      }
+    }
+
+    // Floating label adjustment for outlined
+    .data-table-input-search:not(:placeholder-shown) + label,
+    .data-table-input-search:focus + label {
+      top: 0;
+      transform: translateY(-50%) scale(0.75);
+      left: 14px;
+    }
+  }
+
+  // No Label State (Fallback)
+  &:not(.has-label) {
+    .data-table-input-search {
+      padding: 16px;
+    }
   }
 }

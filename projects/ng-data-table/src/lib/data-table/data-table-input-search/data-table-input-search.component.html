@@ -1,6 +1,27 @@
-<input
-  type="search"
-  [formControl]="searchControl"
-  [placeholder]="placeholder()"
-  class="data-table-input-search"
-/>
+<div class="md3-text-field" [class]="appearance()" [class.has-label]="!!label()">
+  <div class="container">
+    <input
+      type="search"
+      [id]="inputId"
+      [formControl]="searchControl"
+      [placeholder]="label() ? ' ' : placeholder()"
+      class="data-table-input-search"
+    />
+
+    @if (label()) {
+      <label [for]="inputId">{{ label() }}</label>
+    }
+
+    @if (appearance() === 'filled') {
+      <div class="active-indicator"></div>
+    }
+
+    @if (appearance() === 'outlined') {
+      <fieldset class="outline">
+        <legend>
+          <span>{{ label() }}</span>
+        </legend>
+      </fieldset>
+    }
+  </div>
+</div>

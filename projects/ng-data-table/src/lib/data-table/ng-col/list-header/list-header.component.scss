@@ -1,25 +1,25 @@
 .col-header {
   box-sizing: border-box;
-  min-height: 48px;
-  line-height: 48px;
-  height: 48px;
-  max-height: 48px;
+  min-height: var(--dt-header-height);
+  line-height: var(--dt-header-height);
+  height: var(--dt-header-height);
+  max-height: var(--dt-header-height);
   min-width: 20px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding: 0 12px;
+  padding: 0 var(--dt-cell-padding);
   position: sticky;
   top: 0;
-  color: #212121;
-  font-size: 13px;
-  font-weight: 500;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #bdbdbd;
+  color: var(--dt-header-text-color);
+  font-size: var(--dt-header-font-size);
+  font-weight: var(--dt-header-font-weight);
+  background-color: var(--dt-header-bg);
+  border-bottom: 1px solid var(--dt-header-border-bottom);
   z-index: 1;
 
   fa-icon {
-    color: #212121;
+    color: var(--dt-header-text-color);
 
     &:hover {
       cursor: pointer;

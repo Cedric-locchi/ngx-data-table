@@ -6,7 +6,8 @@ A modern, type-safe Angular data table library built with Angular 20+ signals an
 
 - 🎯 **Type-Safe**: Full TypeScript support with runtime validation using Zod
 - ⚡ **Signal-Based**: Built with Angular signals for optimal performance
-- 🎨 **Customizable**: Custom cell templates, styling options, and column configurations
+- 🎨 **Themable**: Built-in Light and Material Design themes with CSS variables support
+- 🎬 **Animations**: Smooth View Transitions for column reordering
 - 📊 **Sorting**: Built-in column sorting with visual indicators
 - 🔍 **Search**: Optional search functionality
 - 🎭 **Flexible**: Support for clickable rows, date formatting, and custom rendering
@@ -108,6 +109,8 @@ The table includes a built-in column management menu that allows users to:
 
 - **Toggle Visibility**: Show or hide columns using the toggle switches.
 - **Reorder Columns**: Drag and drop columns using the grip icon to change their order.
+  - **Visual Feedback**: A blue line indicates where the column will be placed.
+  - **Smooth Animations**: Columns animate to their new positions using the View Transitions API.
 
 ### Column State
 
@@ -277,6 +280,25 @@ columns: colDef[] = [
 
 <!-- Both -->
 <ng-data-table [dataSources]="data" [colDef]="columns" [isStripped]="true" [displayBorder]="true" />
+```
+
+### Theming
+
+The library supports multiple themes. You can switch between them by setting the `data-theme` attribute on the `html` element.
+
+**Available Themes:**
+
+- `light` (Default)
+- `material` (Material Design inspired)
+
+**Example:**
+
+```typescript
+// Switch to Material theme
+document.documentElement.setAttribute('data-theme', 'material');
+
+// Switch to Light theme
+document.documentElement.setAttribute('data-theme', 'light');
 ```
 
 ## 🔒 Type Safety with Zod

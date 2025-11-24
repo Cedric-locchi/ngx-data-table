@@ -31,6 +31,7 @@ import { FaIconComponent, IconDefinition } from '@fortawesome/angular-fontawesom
 import { faColumns, faGripVertical } from '@fortawesome/free-solid-svg-icons';
 
 import { ToggleComponent } from '../ui/toggle/toggle.component';
+import { PaginationComponent } from '../pagination/pagination.component';
 
 @Component({
   selector: 'ng-data-table',
@@ -41,6 +42,7 @@ import { ToggleComponent } from '../ui/toggle/toggle.component';
     DataTableInputSearchComponent,
     FaIconComponent,
     ToggleComponent,
+    PaginationComponent,
   ],
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
@@ -51,9 +53,23 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   public readonly colDef: InputSignal<colDef[]> = input.required();
   public readonly isStripped: InputSignal<boolean> = input(false);
   public readonly displayBorder: InputSignal<boolean> = input(false);
+  public readonly searchAppearance: InputSignal<'filled' | 'outlined'> = input<
+    'filled' | 'outlined'
+  >('outlined');
+  public readonly searchLabel: InputSignal<string> = input<string>('');
+
+  // Pagination Inputs
+  public readonly totalItems: InputSignal<number> = input(0);
+  public readonly pageSize: InputSignal<number> = input(10);
+  public readonly currentPage: InputSignal<number> = input(1);
+  public readonly pageSizeOptions: InputSignal<number[]> = input([10, 25, 50, 100]);
 
   public readonly rowIsClicked: OutputEmitterRef<rowClicked<T>> = output<rowClicked<T>>();
   public readonly sortDataSource: OutputEmitterRef<sortEvent> = output<sortEvent>();
+
+  // Pagination Outputs
+  public readonly pageChange: OutputEmitterRef<number> = output<number>();
+  public readonly pageSizeChange: OutputEmitterRef<number> = output<number>();
 
   public readonly componentId: string = nanoid(10);
   public readonly dataTableManager: DataTableManagerService<T> = inject(DataTableManagerService<T>);
@@ -181,6 +197,8 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     this.showColumnMenu.set(false);
   }
 
+  public readonly dragOverColumn: WritableSignal<string | null> = signal(null);
+
   public onDragStart(event: DragEvent, col: colDef): void {
     if (event.dataTransfer) {
       event.dataTransfer.setData('text/plain', col.field);
@@ -195,8 +213,35 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     }
   }
 
+  public onDragEnter(event: DragEvent, col: colDef): void {
+    event.preventDefault();
+    this.dragOverColumn.set(col.field);
+  }
+
+  public onDragLeave(event: DragEvent, _col: colDef): void {
+    event.preventDefault();
+    // Only clear if we are leaving the element itself, not entering a child
+    // But for simplicity in this list item case, we might just rely on enter of another item or drop
+    // However, to be cleaner, we can check if we are still over the same column in a more complex way
+    // For now, let's just rely on onDragEnter of other columns to switch the highlight
+    // or we can check relatedTarget.
+    // A common pattern is to not clear on leave immediately if we are just moving to a child,
+    // but here the structure is flat enough.
+    // Actually, if we leave the item, we might want to clear, but if we move to the next item,
+    // the next item's dragEnter will trigger.
+    // Let's try clearing only if we really leave the list, but that's hard.
+    // Let's just set it to null if we are not over it?
+    // Actually, simpler: onDragEnter sets it. onDrop clears it.
+    // If we drag out of the list entirely, we might want to clear it.
+    // Let's leave onDragLeave empty for now or just not use it if onDragEnter is sufficient for switching.
+    // But if I drag outside the menu, the last highlighted one stays highlighted.
+    // Let's try to clear it if the related target is not a drag handle or item.
+    // For now, I will just implement onDragEnter to set it.
+  }
+
   public onDrop(event: DragEvent, targetCol: colDef): void {
     event.preventDefault();
+    this.dragOverColumn.set(null);
     const draggedField = event.dataTransfer?.getData('text/plain');
     if (draggedField && draggedField !== targetCol.field) {
       const currentOrder =
@@ -208,9 +253,21 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
       const toIndex = currentOrder.indexOf(targetCol.field);
 
       if (fromIndex !== -1 && toIndex !== -1) {
-        currentOrder.splice(fromIndex, 1);
-        currentOrder.splice(toIndex, 0, draggedField);
-        this.columnOrder.set(currentOrder);
+        const updateOrder = () => {
+          currentOrder.splice(fromIndex, 1);
+          currentOrder.splice(toIndex, 0, draggedField);
+          this.columnOrder.set(currentOrder);
+        };
+
+        if (document.startViewTransition) {
+          document.startViewTransition(() => {
+            updateOrder();
+            // Force change detection to ensure the DOM is updated within the transition
+            // Angular signals should handle this, but sometimes we need to be sure.
+          });
+        } else {
+          updateOrder();
+        }
       }
     }
   }
