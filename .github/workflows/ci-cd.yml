@@ -92,7 +92,7 @@ jobs:
 
       - name: Build library
         if: steps.version_bump.outputs.bump_type != 'none'
-        run: pnpm run build --configuration production
+        run: pnpm run build ng-data-table --configuration production
 
       - name: Verify build
         if: steps.version_bump.outputs.bump_type != 'none'
@@ -101,6 +101,7 @@ jobs:
             echo "Build failed - no output directory"
             exit 1
           fi
+          ls -la dist/ng-data-table
 
       - name: Create tag
         if: steps.version_bump.outputs.bump_type != 'none'
