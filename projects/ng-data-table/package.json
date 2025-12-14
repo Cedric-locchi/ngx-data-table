@@ -1,6 +1,6 @@
 {
   "name": "ng-data-table",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "peerDependencies": {
     "@angular/common": "^20.3.13",
     "@angular/core": "^20.3.13",
