@@ -1,0 +1,132 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm run test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+
+  publish:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - run: pnpm install --no-frozen-lockfile
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine version bump
+        id: version_bump
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if echo "$COMMIT_MSG" | grep -qiE '\[major\]|major:'; then
+            echo "bump_type=major" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -qiE '\[minor\]|minor:'; then
+            echo "bump_type=minor" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -qiE '\[patch\]|patch:'; then
+            echo "bump_type=patch" >> $GITHUB_OUTPUT
+          else
+            echo "bump_type=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump version
+        if: steps.version_bump.outputs.bump_type != 'none'
+        id: bump
+        run: |
+          cd projects/ng-data-table
+          npm version ${{ steps.version_bump.outputs.bump_type }} --no-git-tag-version
+          echo "new_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        if: steps.version_bump.outputs.bump_type != 'none'
+        run: |
+          git add projects/ng-data-table/package.json
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
+          git push
+
+      - name: Build library
+        if: steps.version_bump.outputs.bump_type != 'none'
+        run: pnpm run build --configuration production
+
+      - name: Verify build
+        if: steps.version_bump.outputs.bump_type != 'none'
+        run: |
+          if [ ! -d "dist/ng-data-table" ]; then
+            echo "Build failed - no output directory"
+            exit 1
+          fi
+
+      - name: Create tag
+        if: steps.version_bump.outputs.bump_type != 'none'
+        run: |
+          git tag v${{ steps.bump.outputs.new_version }}
+          git push origin v${{ steps.bump.outputs.new_version }}
+
+      - name: Publish to npm
+        if: steps.version_bump.outputs.bump_type != 'none'
+        run: cd dist/ng-data-table && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Release
+        if: steps.version_bump.outputs.bump_type != 'none'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          name: Release v${{ steps.bump.outputs.new_version }}
+          body: |
+            ## Changes
+            ${{ github.event.head_commit.message }}
+
+            ## How to install
+            ```bash
+            npm install ng-data-table@${{ steps.bump.outputs.new_version }}
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
