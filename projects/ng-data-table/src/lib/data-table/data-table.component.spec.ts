@@ -277,6 +277,7 @@ describe('DataTableComponent', () => {
         { field: 'col2', headerName: 'Col 2' },
         { field: 'col3', headerName: 'Col 3' },
       ]);
+      fixture.detectChanges(); // Ajout nécessaire pour initialiser le composant
 
       const dragEvent = {
         preventDefault: vi.fn(),
@@ -286,6 +287,17 @@ describe('DataTableComponent', () => {
       } as unknown as DragEvent;
 
       const targetCol = { field: 'col3', headerName: 'Col 3' } as colDef;
+
+      // Initialiser le drag pour remplir columnFieldToIndexMap
+      component.onDragStart(
+        {
+          dataTransfer: {
+            setData: vi.fn(),
+            effectAllowed: '',
+          },
+        } as unknown as DragEvent,
+        { field: 'col1', headerName: 'Col 1' } as colDef
+      );
 
       component.onDrop(dragEvent, targetCol);
 
@@ -388,6 +400,17 @@ describe('DataTableComponent', () => {
         } as unknown as DragEvent;
 
         const targetCol = { field: 'col2', headerName: 'Col 2' } as colDef;
+
+        // Initialiser le drag pour remplir columnFieldToIndexMap
+        component.onDragStart(
+          {
+            dataTransfer: {
+              setData: vi.fn(),
+              effectAllowed: '',
+            },
+          } as unknown as DragEvent,
+          { field: 'col1', headerName: 'Col 1' } as colDef
+        );
 
         component.onDrop(dragEvent, targetCol);
         fixture.detectChanges();

@@ -58,7 +58,6 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   >('outlined');
   public readonly searchLabel: InputSignal<string> = input<string>('');
 
-  // Pagination Inputs
   public readonly totalItems: InputSignal<number> = input(0);
   public readonly pageSize: InputSignal<number> = input(10);
   public readonly currentPage: InputSignal<number> = input(1);
@@ -67,7 +66,6 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   public readonly rowIsClicked: OutputEmitterRef<rowClicked<T>> = output<rowClicked<T>>();
   public readonly sortDataSource: OutputEmitterRef<sortEvent> = output<sortEvent>();
 
-  // Pagination Outputs
   public readonly pageChange: OutputEmitterRef<number> = output<number>();
   public readonly pageSizeChange: OutputEmitterRef<number> = output<number>();
 
@@ -95,7 +93,6 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     const order = this.columnOrder();
     const cols = this.localColDef();
 
-    // Sort columns based on order
     return [...cols].sort((a, b) => {
       const indexA = order.indexOf(a.field);
       const indexB = order.indexOf(b.field);
@@ -199,10 +196,16 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   public readonly dragOverColumn: WritableSignal<string | null> = signal(null);
 
+  private columnFieldToIndexMap = new Map<string, number>();
+
+  private lastDragEnterTime = 0;
+  private readonly DRAG_THROTTLE_TIME = 50; // ms
+
   public onDragStart(event: DragEvent, col: colDef): void {
     if (event.dataTransfer) {
       event.dataTransfer.setData('text/plain', col.field);
       event.dataTransfer.effectAllowed = 'move';
+      this.initializeColumnMap();
     }
   }
 
@@ -215,60 +218,87 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   public onDragEnter(event: DragEvent, col: colDef): void {
     event.preventDefault();
-    this.dragOverColumn.set(col.field);
+    const now = Date.now();
+    if (now - this.lastDragEnterTime >= this.DRAG_THROTTLE_TIME) {
+      if (this.dragOverColumn() !== col.field) {
+        this.dragOverColumn.set(col.field);
+        this.lastDragEnterTime = now;
+      }
+    }
   }
 
-  public onDragLeave(event: DragEvent, _col: colDef): void {
+  public onDragLeave(event: DragEvent, col: colDef): void {
     event.preventDefault();
-    // Only clear if we are leaving the element itself, not entering a child
-    // But for simplicity in this list item case, we might just rely on enter of another item or drop
-    // However, to be cleaner, we can check if we are still over the same column in a more complex way
-    // For now, let's just rely on onDragEnter of other columns to switch the highlight
-    // or we can check relatedTarget.
-    // A common pattern is to not clear on leave immediately if we are just moving to a child,
-    // but here the structure is flat enough.
-    // Actually, if we leave the item, we might want to clear, but if we move to the next item,
-    // the next item's dragEnter will trigger.
-    // Let's try clearing only if we really leave the list, but that's hard.
-    // Let's just set it to null if we are not over it?
-    // Actually, simpler: onDragEnter sets it. onDrop clears it.
-    // If we drag out of the list entirely, we might want to clear it.
-    // Let's leave onDragLeave empty for now or just not use it if onDragEnter is sufficient for switching.
-    // But if I drag outside the menu, the last highlighted one stays highlighted.
-    // Let's try to clear it if the related target is not a drag handle or item.
-    // For now, I will just implement onDragEnter to set it.
+    const relatedTarget = event.relatedTarget as HTMLElement | null;
+    if (!relatedTarget || !relatedTarget.closest?.('ng-list-header')) {
+      if (this.dragOverColumn() === col.field) {
+        this.dragOverColumn.set(null);
+      }
+    }
   }
 
   public onDrop(event: DragEvent, targetCol: colDef): void {
     event.preventDefault();
+
     this.dragOverColumn.set(null);
+
     const draggedField = event.dataTransfer?.getData('text/plain');
-    if (draggedField && draggedField !== targetCol.field) {
-      const currentOrder =
-        this.columnOrder().length > 0
-          ? [...this.columnOrder()]
-          : this.localColDef().map((c) => c.field);
 
-      const fromIndex = currentOrder.indexOf(draggedField);
-      const toIndex = currentOrder.indexOf(targetCol.field);
+    if (!draggedField || draggedField === targetCol.field) {
+      return;
+    }
 
-      if (fromIndex !== -1 && toIndex !== -1) {
+    try {
+      const fromIndex = this.columnFieldToIndexMap.get(draggedField);
+      const toIndex = this.columnFieldToIndexMap.get(targetCol.field);
+
+      if (fromIndex !== undefined && toIndex !== undefined && fromIndex !== -1 && toIndex !== -1) {
         const updateOrder = () => {
+          const currentOrder =
+            this.columnOrder().length > 0
+              ? [...this.columnOrder()]
+              : this.localColDef().map((c) => c.field);
+
           currentOrder.splice(fromIndex, 1);
           currentOrder.splice(toIndex, 0, draggedField);
+
           this.columnOrder.set(currentOrder);
+          this.updateColumnMap(currentOrder);
         };
 
         if (document.startViewTransition) {
           document.startViewTransition(() => {
             updateOrder();
-            // Force change detection to ensure the DOM is updated within the transition
-            // Angular signals should handle this, but sometimes we need to be sure.
           });
         } else {
           updateOrder();
         }
       }
+    } catch (error) {
+      console.error('Error during column reordering:', error);
+      this.dragOverColumn.set(null);
     }
+  }
+
+  private initializeColumnMap(): void {
+    const currentOrder =
+      this.columnOrder().length > 0 ? this.columnOrder() : this.localColDef().map((c) => c.field);
+
+    this.columnFieldToIndexMap.clear();
+    currentOrder.forEach((field, index) => {
+      this.columnFieldToIndexMap.set(field, index);
+    });
+  }
+
+  private updateColumnMap(newOrder: string[]): void {
+    this.columnFieldToIndexMap.clear();
+    newOrder.forEach((field, index) => {
+      this.columnFieldToIndexMap.set(field, index);
+    });
+  }
+
+  public cleanupDragState(): void {
+    this.dragOverColumn.set(null);
+    this.lastDragEnterTime = 0;
   }
 }
